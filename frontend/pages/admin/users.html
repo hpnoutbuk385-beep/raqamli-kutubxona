@@ -10,13 +10,13 @@
   <div class="app-layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
-      <div class="page-header"><h1>👥 <span data-i18n="manage_users">Foydalanuvchilar</span></h1><p data-i18n="manage_users_desc">O'quvchilar va o'qituvchilarni boshqarish</p></div>
+      <div class="page-header"><h1>рџ‘Ґ <span data-i18n="manage_users">Foydalanuvchilar</span></h1><p data-i18n="manage_users_desc">O'quvchilar va o'qituvchilarni boshqarish</p></div>
       <div class="tabs" style="max-width:400px;">
-        <button class="tab active" onclick="showTab('students', this)">👨‍🎓 <span data-i18n="students_tab">O'quvchilar</span></button>
-        <button class="tab" onclick="showTab('teachers', this)">👨‍🏫 <span data-i18n="teachers_tab">O'qituvchilar</span></button>
+        <button class="tab active" onclick="showTab('students', this)">рџ‘ЁвЂЌрџЋ“ <span data-i18n="students_tab">O'quvchilar</span></button>
+        <button class="tab" onclick="showTab('teachers', this)">рџ‘ЁвЂЌрџЏ« <span data-i18n="teachers_tab">O'qituvchilar</span></button>
       </div>
       <div class="search-bar">
-        <div class="search-input"><span class="search-icon">🔍</span><input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="Qidirish..." oninput="debounceSearch()"></div>
+        <div class="search-input"><span class="search-icon">рџ”Ќ</span><input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="Qidirish..." oninput="debounceSearch()"></div>
         <button class="btn btn-primary" id="addBtn" onclick="openAdd()">+ <span data-i18n="add_new">Qo'shish</span></button>
       </div>
       <div class="card"><div class="table-container" id="usersTable"><div class="loading-spinner"><div class="spinner"></div></div></div></div>
@@ -34,10 +34,10 @@
       </div>
     </main>
   </div>
-  <script src="../../../js/i18n.js?v=2"></script>
-  <script src="../../../js/api.js?v=2"></script>
-  <script src="../../../js/auth.js?v=2"></script>
-  <script src="../../../js/app.js?v=2"></script>
+  <script src="../../../js/i18n.js?v=1785013902"></script>
+  <script src="../../../js/api.js?v=1785013902"></script>
+  <script src="../../../js/auth.js?v=1785013902"></script>
+  <script src="../../../js/app.js?v=1785013902"></script>
   <script>
     if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -48,11 +48,11 @@
     async function loadUsers() {
       const container = document.getElementById('usersTable');
       try { const search = document.getElementById('searchInput').value; const users = currentTab === 'students' ? await api.users.students(search) : await api.users.teachers(search);
-        if (users.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><h3>${t('no_users')}</h3></div>`; return; }
+        if (users.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">рџ‘Ґ</div><h3>${t('no_users')}</h3></div>`; return; }
         if (currentTab === 'students') { container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>${t('class')}</th><th>${t('phone')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr></thead><tbody>
-          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.student_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong><br><span style="font-size:12px;color:#6b7280;">${u.father_name || ''}</span></td><td>${u.class_number || ''}-${u.class_letter || ''}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button></td></tr>`).join('')}
+          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.student_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong><br><span style="font-size:12px;color:#6b7280;">${u.father_name || ''}</span></td><td>${u.class_number || ''}-${u.class_letter || ''}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? 'рџ”’' : 'рџ”“'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">рџ—‘пёЏ</button></td></tr>`).join('')}
         </tbody></table>`; } else { container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>${t('subject')}</th><th>${t('position')}</th><th>${t('phone')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr></thead><tbody>
-          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.teacher_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong></td><td>${u.subject || '-'}</td><td>${u.position || '-'}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button></td></tr>`).join('')}
+          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.teacher_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong></td><td>${u.subject || '-'}</td><td>${u.position || '-'}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? 'рџ”’' : 'рџ”“'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">рџ—‘пёЏ</button></td></tr>`).join('')}
         </tbody></table>`; }
       } catch (err) { container.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }

@@ -12,20 +12,20 @@
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-header">
-        <h1 data-i18n="admin_dashboard">📊 Dashboard</h1>
+        <h1 data-i18n="admin_dashboard">рџ“Љ Dashboard</h1>
         <p data-i18n="admin_subtitle">Kutubxona boshqaruv paneli</p>
       </div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-value" id="s1">-</div><div class="stat-label" data-i18n="total_books">Jami kitoblar</div></div>
-        <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-value" id="s2">-</div><div class="stat-label" data-i18n="available_books">Mavjud kitoblar</div></div>
-        <div class="stat-card"><div class="stat-icon">🟡</div><div class="stat-value" id="s3">-</div><div class="stat-label" data-i18n="active_reservations">Bronlar</div></div>
-        <div class="stat-card"><div class="stat-icon">🔴</div><div class="stat-value" id="s4">-</div><div class="stat-label" data-i18n="active_borrowings">Olingan kitoblar</div></div>
-        <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div class="stat-value" id="s5">-</div><div class="stat-label" data-i18n="total_students">O'quvchilar</div></div>
-        <div class="stat-card"><div class="stat-icon">👨‍🏫</div><div class="stat-value" id="s6">-</div><div class="stat-label" data-i18n="total_teachers">O'qituvchilar</div></div>
-        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-value" id="s7">-</div><div class="stat-label" data-i18n="today_reservations">Bugungi bronlar</div></div>
-        <div class="stat-card"><div class="stat-icon">📖</div><div class="stat-value" id="s8">-</div><div class="stat-label" data-i18n="today_borrowed">Bugun berilgan</div></div>
-        <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="s9">-</div><div class="stat-label" data-i18n="today_returned">Bugun qaytarilgan</div></div>
-        <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-value" id="s10">-</div><div class="stat-label" data-i18n="overdue_count">Kechikkan</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ“љ</div><div class="stat-value" id="s1">-</div><div class="stat-label" data-i18n="total_books">Jami kitoblar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџџў</div><div class="stat-value" id="s2">-</div><div class="stat-label" data-i18n="available_books">Mavjud kitoblar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџџЎ</div><div class="stat-value" id="s3">-</div><div class="stat-label" data-i18n="active_reservations">Bronlar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ”ґ</div><div class="stat-value" id="s4">-</div><div class="stat-label" data-i18n="active_borrowings">Olingan kitoblar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ‘ЁвЂЌрџЋ“</div><div class="stat-value" id="s5">-</div><div class="stat-label" data-i18n="total_students">O'quvchilar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ‘ЁвЂЌрџЏ«</div><div class="stat-value" id="s6">-</div><div class="stat-label" data-i18n="total_teachers">O'qituvchilar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ“‹</div><div class="stat-value" id="s7">-</div><div class="stat-label" data-i18n="today_reservations">Bugungi bronlar</div></div>
+        <div class="stat-card"><div class="stat-icon">рџ“–</div><div class="stat-value" id="s8">-</div><div class="stat-label" data-i18n="today_borrowed">Bugun berilgan</div></div>
+        <div class="stat-card"><div class="stat-icon">вњ…</div><div class="stat-value" id="s9">-</div><div class="stat-label" data-i18n="today_returned">Bugun qaytarilgan</div></div>
+        <div class="stat-card"><div class="stat-icon">вљ пёЏ</div><div class="stat-value" id="s10">-</div><div class="stat-label" data-i18n="overdue_count">Kechikkan</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <div class="card"><div class="card-header"><h3 data-i18n="popular_books">Eng ko'p o'qilgan kitoblar</h3></div><div class="card-body" id="popularBooks"><div class="loading-spinner"><div class="spinner"></div></div></div></div>
@@ -33,10 +33,10 @@
       </div>
     </main>
   </div>
-  <script src="../../../js/i18n.js?v=2"></script>
-  <script src="../../../js/api.js?v=2"></script>
-  <script src="../../../js/auth.js?v=2"></script>
-  <script src="../../../js/app.js?v=2"></script>
+  <script src="../../../js/i18n.js?v=1785013902"></script>
+  <script src="../../../js/api.js?v=1785013902"></script>
+  <script src="../../../js/auth.js?v=1785013902"></script>
+  <script src="../../../js/app.js?v=1785013902"></script>
   <script>
     if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -57,9 +57,9 @@
         if (stats.overdue_count > 0) document.getElementById('s10').parentElement.style.border = '2px solid #dc2626';
         const [popular, active] = await Promise.all([api.admin.popularBooks(), api.admin.activeStudents()]);
         const pc = document.getElementById('popularBooks');
-        if (popular.length === 0) showEmpty(pc, '📚', t('no_data_yet'), ''); else pc.innerHTML = `<table><thead><tr><th>#</th><th>${t('book')}</th><th>${t('author')}</th><th>${t('times')}</th></tr></thead><tbody>${popular.map((b, i) => `<tr><td>${i+1}</td><td><strong>${b.title}</strong></td><td>${b.author_name || '-'}</td><td><span class="badge badge-student">${b.borrow_count} ${t('times')}</span></td></tr>`).join('')}</tbody></table>`;
+        if (popular.length === 0) showEmpty(pc, 'рџ“љ', t('no_data_yet'), ''); else pc.innerHTML = `<table><thead><tr><th>#</th><th>${t('book')}</th><th>${t('author')}</th><th>${t('times')}</th></tr></thead><tbody>${popular.map((b, i) => `<tr><td>${i+1}</td><td><strong>${b.title}</strong></td><td>${b.author_name || '-'}</td><td><span class="badge badge-student">${b.borrow_count} ${t('times')}</span></td></tr>`).join('')}</tbody></table>`;
         const ac = document.getElementById('activeStudents');
-        if (active.length === 0) showEmpty(ac, '👤', t('no_data_yet'), ''); else ac.innerHTML = `<table><thead><tr><th>#</th><th>${t('student')}</th><th>${t('class')}</th><th>${t('borrowed_books')}</th></tr></thead><tbody>${active.map((s, i) => `<tr><td>${i+1}</td><td><strong>${s.last_name} ${s.first_name}</strong></td><td>${s.class_number}-${s.class_letter}</td><td><span class="badge badge-student">${s.borrow_count} ${t('items')}</span></td></tr>`).join('')}</tbody></table>`;
+        if (active.length === 0) showEmpty(ac, 'рџ‘¤', t('no_data_yet'), ''); else ac.innerHTML = `<table><thead><tr><th>#</th><th>${t('student')}</th><th>${t('class')}</th><th>${t('borrowed_books')}</th></tr></thead><tbody>${active.map((s, i) => `<tr><td>${i+1}</td><td><strong>${s.last_name} ${s.first_name}</strong></td><td>${s.class_number}-${s.class_letter}</td><td><span class="badge badge-student">${s.borrow_count} ${t('items')}</span></td></tr>`).join('')}</tbody></table>`;
       } catch (err) { console.error(err); }
     }
     loadDashboard();
