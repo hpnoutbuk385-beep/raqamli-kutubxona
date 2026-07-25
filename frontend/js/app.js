@@ -55,7 +55,8 @@ function renderSidebar() {
 
   document.getElementById('sidebar').innerHTML = `
     <div class="sidebar-header">
-      <h2>📚 <span data-i18n="app_name">${t('app_name')}</span></h2>
+      <img src="${isAdminUser ? '../../images/logo.svg' : '../../images/logo.svg'}" alt="Logo" style="width:44px;height:44px;margin-bottom:6px;">
+      <h2 style="margin-top:4px;"><span data-i18n="app_name">${t('app_name')}</span></h2>
       <p data-i18n="app_desc">${t('app_desc')}</p>
     </div>
     <nav class="sidebar-nav">

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="nav_profile">Profil</title>
+  <link rel="icon" type="image/svg+xml" href="../../images/favicon.svg">
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
@@ -14,7 +15,14 @@
         <h1 data-i18n="profile_title">👤 Profil</h1>
         <p data-i18n="profile_subtitle">Shaxsiy ma'lumotlaringiz</p>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <div class="profile-top-card card" id="profileTopCard">
+        <div class="card-body" style="padding:32px;text-align:center;">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
         <div class="card">
           <div class="card-header"><h3 data-i18n="personal_info">Shaxsiy ma'lumotlar</h3></div>
           <div class="card-body" id="profileInfo"><div class="loading-spinner"><div class="spinner"></div></div></div>
@@ -34,33 +42,89 @@
     if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
     function refreshPage() { loadProfile(); loadNotifications(); applyLangToElements(); }
+
+    const avatarColors = ['#2563eb','#7c3aed','#0891b2','#16a34a','#d97706','#dc2626','#db2777','#4f46e5'];
+
+    function getAvatarColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return avatarColors[Math.abs(hash) % avatarColors.length];
+    }
+
     async function loadProfile() {
       try {
-        const user = await api.auth.me(); const p = user.profile; const container = document.getElementById('profileInfo');
-        let h = `<div style="text-align:center;margin-bottom:20px;">
-          <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:28px;font-weight:700;">${getUserInitials(user)}</div>
-          <h3 style="margin-top:8px;">${getUserFullName(user)}</h3>
-          <span class="badge ${user.role === 'student' ? 'badge-student' : 'badge-teacher'}">${t(user.role)}</span></div>`;
+        const user = await api.auth.me();
+        const p = user.profile;
+        const fullName = getUserFullName(user);
+        const color = getAvatarColor(fullName);
+        const roleKey = user.role === 'student' ? 'student' : user.role === 'teacher' ? 'teacher' : 'admin';
+        const roleLabel = t(roleKey);
+        const badgeClass = user.role === 'student' ? 'badge-student' : user.role === 'teacher' ? 'badge-teacher' : 'badge-admin';
+
+        document.getElementById('profileTopCard').innerHTML = `
+          <div class="card-body" style="padding:32px;">
+            <div style="display:flex;align-items:center;gap:24px;">
+              <div style="width:100px;height:100px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-size:36px;font-weight:700;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                ${getUserInitials(user)}
+              </div>
+              <div style="flex:1;text-align:left;">
+                <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">${fullName}</h2>
+                <span class="badge ${badgeClass}" style="font-size:13px;padding:5px 14px;">${roleLabel}</span>
+                ${p && p.student_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">🎓 ${t('student')} ID: <strong style="color:#111827;">${p.student_id}</strong></div>` : ''}
+                ${p && p.teacher_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">🎓 ${t('teacher')} ID: <strong style="color:#111827;">${p.teacher_id}</strong></div>` : ''}
+                ${p && p.class_number ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">🏫 ${t('class')}: <strong style="color:#111827;">${p.class_number}-${p.class_letter}</strong></div>` : ''}
+                ${p && p.subject ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">📖 ${t('subject')}: <strong style="color:#111827;">${p.subject}</strong></div>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        const infoContainer = document.getElementById('profileInfo');
         if (p) {
-          const row = (label, val) => val ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;"><span style="color:#6b7280;">${label}</span><strong>${val}</strong></div>` : '';
-          h += `<div style="display:grid;gap:0;">
-            ${row(t('first_name'), p.first_name)}${row(t('last_name'), p.last_name)}${row(t('father_name'), p.father_name)}
-            ${row(t('phone'), p.phone)}${user.role === 'student' && p.class_number ? row(t('class'), p.class_number + '-' + p.class_letter) : ''}
-            ${row(t('student') + ' ID', p.student_id)}${row(t('teacher') + ' ID', p.teacher_id)}
-            ${p.subject ? row(t('subject'), p.subject) : ''}${p.position ? row(t('position'), p.position) : ''}
-            ${row(t('login_label'), user.username)}</div>`;
+          const row = (icon, label, val) => val ? `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f3f4f6;"><span style="font-size:18px;width:28px;text-align:center;">${icon}</span><span style="color:#6b7280;min-width:140px;">${label}</span><strong style="flex:1;">${val}</strong></div>` : '';
+          infoContainer.innerHTML = `<div style="display:grid;gap:0;">
+            ${row('👤', t('first_name'), p.first_name)}
+            ${row('👤', t('last_name'), p.last_name)}
+            ${p.father_name ? row('👨', t('father_name'), p.father_name) : ''}
+            ${row('📞', t('phone'), p.phone || '-')}
+            ${user.role === 'student' && p.class_number ? row('🏫', t('class'), p.class_number + '-' + p.class_letter) : ''}
+            ${p.subject ? row('📖', t('subject'), p.subject) : ''}
+            ${p.position ? row('💼', t('position'), p.position) : ''}
+            ${row('🔑', t('login_label'), user.username)}
+            ${row('📧', 'Email', user.email || '-')}
+          </div>`;
+        } else {
+          infoContainer.innerHTML = `<div style="text-align:center;padding:20px;color:#6b7280;">
+            <p>${t('no_data')}</p>
+          </div>`;
         }
-        container.innerHTML = h;
-      } catch (err) { document.getElementById('profileInfo').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
+      } catch (err) {
+        document.getElementById('profileTopCard').innerHTML = `<div class="card-body"><div class="alert alert-error">${err.message}</div></div>`;
+        document.getElementById('profileInfo').innerHTML = '';
+      }
     }
+
     async function loadNotifications() {
       try {
-        const notifs = await api.notifications.list(); const container = document.getElementById('notificationsList');
+        const notifs = await api.notifications.list();
+        const container = document.getElementById('notificationsList');
         if (notifs.length === 0) { showEmpty(container, '🔔', t('no_notifications'), t('no_notifications_desc')); return; }
-        container.innerHTML = notifs.map(n => `<div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="markNotifRead('${n.id}', this)"><div class="notif-title">${n.title}</div><div class="notif-message">${n.message}</div><div class="notif-time">${formatDateTime(n.created_at)}</div></div>`).join('');
-      } catch (err) { document.getElementById('notificationsList').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
+        container.innerHTML = notifs.map(n => `
+          <div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="markNotifRead('${n.id}', this)">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-message">${n.message}</div>
+            <div class="notif-time">${formatDateTime(n.created_at)}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('notificationsList').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
     }
-    async function markNotifRead(id, el) { try { await api.notifications.markRead(id); el.classList.remove('unread'); } catch (e) {} }
+
+    async function markNotifRead(id, el) {
+      try { await api.notifications.markRead(id); el.classList.remove('unread'); } catch (e) {}
+    }
+
     loadProfile(); loadNotifications();
   </script>
 </body>
