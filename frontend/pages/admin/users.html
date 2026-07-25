@@ -1,181 +1,65 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Foydalanuvchilar - Admin</title>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="manage_users">Foydalanuvchilar</title>
   <link rel="stylesheet" href="../../../css/style.css">
 </head>
 <body>
   <div class="app-layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
-      <div class="page-header">
-        <h1>👥 Foydalanuvchilar</h1>
-        <p>O'quvchilar va o'qituvchilarni boshqarish</p>
-      </div>
-
+      <div class="page-header"><h1>👥 <span data-i18n="manage_users">Foydalanuvchilar</span></h1><p data-i18n="manage_users_desc">O'quvchilar va o'qituvchilarni boshqarish</p></div>
       <div class="tabs" style="max-width:400px;">
-        <button class="tab active" onclick="showTab('students', this)">👨‍🎓 O'quvchilar</button>
-        <button class="tab" onclick="showTab('teachers', this)">👨‍🏫 O'qituvchilar</button>
+        <button class="tab active" onclick="showTab('students', this)">👨‍🎓 <span data-i18n="students_tab">O'quvchilar</span></button>
+        <button class="tab" onclick="showTab('teachers', this)">👨‍🏫 <span data-i18n="teachers_tab">O'qituvchilar</span></button>
       </div>
-
       <div class="search-bar">
-        <div class="search-input">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Qidirish..." oninput="debounceSearch()">
-        </div>
-        <button class="btn btn-primary" id="addBtn" onclick="openAdd()">+ Qo'shish</button>
+        <div class="search-input"><span class="search-icon">🔍</span><input type="text" id="searchInput" data-i18n-placeholder="search" placeholder="Qidirish..." oninput="debounceSearch()"></div>
+        <button class="btn btn-primary" id="addBtn" onclick="openAdd()">+ <span data-i18n="add_new">Qo'shish</span></button>
       </div>
-
-      <div class="card">
-        <div class="table-container" id="usersTable"><div class="loading-spinner"><div class="spinner"></div></div></div>
-      </div>
-
+      <div class="card"><div class="table-container" id="usersTable"><div class="loading-spinner"><div class="spinner"></div></div></div></div>
       <div id="userModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
-        <div class="modal">
-          <div class="modal-header">
-            <h2 id="modalTitle">Foydalanuvchi</h2>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-          </div>
-          <div class="modal-body">
-            <form id="userForm" onsubmit="saveUser(event)">
-              <div class="form-row">
-                <div class="form-group"><label>Login *</label><input type="text" class="form-control" id="uUsername" required></div>
-                <div class="form-group"><label>Parol</label><input type="password" class="form-control" id="uPassword" placeholder="Ixtiyoriy"></div>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label>Ism *</label><input type="text" class="form-control" id="uFirstName" required></div>
-                <div class="form-group"><label>Familiya *</label><input type="text" class="form-control" id="uLastName" required></div>
-              </div>
-              <div class="form-group"><label>Telefon</label><input type="text" class="form-control" id="uPhone"></div>
-              <div id="studentFieldsAdmin">
-                <div class="form-row">
-                  <div class="form-group"><label>Sinf</label><select class="form-control" id="uClassNum"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9" selected>9</option><option value="10">10</option><option value="11">11</option></select></div>
-                  <div class="form-group"><label>Harf</label><select class="form-control" id="uClassLetter"><option value="A">A</option><option value="B" selected>B</option><option value="V">V</option><option value="G">G</option><option value="E">E</option></select></div>
-                </div>
-              </div>
-              <div id="teacherFieldsAdmin" style="display:none;">
-                <div class="form-group"><label>Fan</label><input type="text" class="form-control" id="uSubject"></div>
-                <div class="form-group"><label>Lavozim</label><input type="text" class="form-control" id="uPosition"></div>
-              </div>
-              <div class="modal-footer" style="padding:0;border:none;margin-top:16px;">
-                <button type="button" class="btn btn-outline" onclick="closeModal()">Bekor</button>
-                <button type="submit" class="btn btn-primary">Saqlash</button>
-              </div>
-            </form>
-          </div>
+        <div class="modal"><div class="modal-header"><h2 id="modalTitle">Foydalanuvchi</h2><button class="modal-close" onclick="closeModal()">&times;</button></div>
+          <div class="modal-body"><form id="userForm" onsubmit="saveUser(event)">
+            <div class="form-row"><div class="form-group"><label data-i18n="username">Login *</label><input type="text" class="form-control" id="uUsername" required></div><div class="form-group"><label data-i18n="password">Parol</label><input type="password" class="form-control" id="uPassword"></div></div>
+            <div class="form-row"><div class="form-group"><label data-i18n="first_name">Ism *</label><input type="text" class="form-control" id="uFirstName" required></div><div class="form-group"><label data-i18n="last_name">Familiya *</label><input type="text" class="form-control" id="uLastName" required></div></div>
+            <div class="form-group"><label data-i18n="phone">Telefon</label><input type="text" class="form-control" id="uPhone"></div>
+            <div id="studentFieldsAdmin"><div class="form-row"><div class="form-group"><label data-i18n="class">Sinf</label><select class="form-control" id="uClassNum"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9" selected>9</option><option value="10">10</option><option value="11">11</option></select></div><div class="form-group"><label data-i18n="class_letter">Harf</label><select class="form-control" id="uClassLetter"><option value="A">A</option><option value="B" selected>B</option><option value="V">V</option><option value="G">G</option><option value="E">E</option></select></div></div></div>
+            <div id="teacherFieldsAdmin" style="display:none;"><div class="form-group"><label data-i18n="subject">Fan</label><input type="text" class="form-control" id="uSubject"></div><div class="form-group"><label data-i18n="position">Lavozim</label><input type="text" class="form-control" id="uPosition"></div></div>
+            <div class="modal-footer" style="padding:0;border:none;margin-top:16px;"><button type="button" class="btn btn-outline" onclick="closeModal()" data-i18n="cancel">Bekor</button><button type="submit" class="btn btn-primary" data-i18n="save">Saqlash</button></div>
+          </form></div>
         </div>
       </div>
     </main>
   </div>
-
+  <script src="../../../js/i18n.js"></script>
   <script src="../../../js/api.js"></script>
   <script src="../../../js/auth.js"></script>
   <script src="../../../js/app.js"></script>
   <script>
     if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
-    renderSidebar();
-
-    let currentTab = 'students';
-    let searchTimeout;
-
-    function showTab(tab, el) {
-      currentTab = tab;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('studentFieldsAdmin').style.display = tab === 'students' ? 'block' : 'none';
-      document.getElementById('teacherFieldsAdmin').style.display = tab === 'teachers' ? 'block' : 'none';
-      loadUsers();
-    }
-
+    renderSidebar(); applyLangToElements();
+    function refreshPage() { loadUsers(); applyLangToElements(); }
+    let currentTab = 'students'; let searchTimeout;
+    function showTab(tab, el) { currentTab = tab; document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); document.getElementById('studentFieldsAdmin').style.display = tab === 'students' ? 'block' : 'none'; document.getElementById('teacherFieldsAdmin').style.display = tab === 'teachers' ? 'block' : 'none'; loadUsers(); }
     function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(loadUsers, 300); }
-
     async function loadUsers() {
       const container = document.getElementById('usersTable');
-      try {
-        const search = document.getElementById('searchInput').value;
-        const users = currentTab === 'students' ? await api.users.students(search) : await api.users.teachers(search);
-
-        if (users.length === 0) {
-          container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><h3>Foydalanuvchilar yo\'q</h3></div>';
-          return;
-        }
-
-        if (currentTab === 'students') {
-          container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>Sinf</th><th>Telefon</th><th>Status</th><th>Amallar</th></tr></thead><tbody>
-            ${users.map(u => `<tr>
-              <td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.student_id || '-'}</code></td>
-              <td><strong>${u.last_name || ''} ${u.first_name || ''}</strong><br><span style="font-size:12px;color:#6b7280;">${u.father_name || ''}</span></td>
-              <td>${u.class_number || ''}-${u.class_letter || ''}</td>
-              <td>${u.phone || '-'}</td>
-              <td>${u.is_active ? '<span class="badge badge-available">Faol</span>' : '<span class="badge badge-cancelled">Nofaol</span>'}</td>
-              <td>
-                <button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button>
-              </td>
-            </tr>`).join('')}
-          </tbody></table>`;
-        } else {
-          container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>Fan</th><th>Lavozim</th><th>Telefon</th><th>Status</th><th>Amallar</th></tr></thead><tbody>
-            ${users.map(u => `<tr>
-              <td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.teacher_id || '-'}</code></td>
-              <td><strong>${u.last_name || ''} ${u.first_name || ''}</strong></td>
-              <td>${u.subject || '-'}</td>
-              <td>${u.position || '-'}</td>
-              <td>${u.phone || '-'}</td>
-              <td>${u.is_active ? '<span class="badge badge-available">Faol</span>' : '<span class="badge badge-cancelled">Nofaol</span>'}</td>
-              <td>
-                <button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button>
-              </td>
-            </tr>`).join('')}
-          </tbody></table>`;
-        }
+      try { const search = document.getElementById('searchInput').value; const users = currentTab === 'students' ? await api.users.students(search) : await api.users.teachers(search);
+        if (users.length === 0) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><h3>${t('no_users')}</h3></div>`; return; }
+        if (currentTab === 'students') { container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>${t('class')}</th><th>${t('phone')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr></thead><tbody>
+          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.student_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong><br><span style="font-size:12px;color:#6b7280;">${u.father_name || ''}</span></td><td>${u.class_number || ''}-${u.class_letter || ''}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button></td></tr>`).join('')}
+        </tbody></table>`; } else { container.innerHTML = `<table><thead><tr><th>ID</th><th>F.I.Sh</th><th>${t('subject')}</th><th>${t('position')}</th><th>${t('phone')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr></thead><tbody>
+          ${users.map(u => `<tr><td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${u.teacher_id || '-'}</code></td><td><strong>${u.last_name || ''} ${u.first_name || ''}</strong></td><td>${u.subject || '-'}</td><td>${u.position || '-'}</td><td>${u.phone || '-'}</td><td>${u.is_active ? `<span class="badge badge-available">${t('active')}</span>` : `<span class="badge badge-cancelled">${t('inactive')}</span>`}</td><td><button class="btn btn-sm btn-outline" onclick="toggleUser('${u.id}')">${u.is_active ? '🔒' : '🔓'}</button> <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}','${(u.last_name||'')+(u.first_name||'')}')">🗑️</button></td></tr>`).join('')}
+        </tbody></table>`; }
       } catch (err) { container.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
-
-    function openAdd() {
-      document.getElementById('modalTitle').textContent = currentTab === 'students' ? 'O\'quvchi qo\'shish' : 'O\'qituvchi qo\'shish';
-      document.getElementById('userForm').reset();
-      document.getElementById('userModal').style.display = 'flex';
-    }
-
-    async function saveUser(e) {
-      e.preventDefault();
-      try {
-        const data = {
-          username: document.getElementById('uUsername').value,
-          password: document.getElementById('uPassword').value || undefined,
-          first_name: document.getElementById('uFirstName').value,
-          last_name: document.getElementById('uLastName').value,
-          phone: document.getElementById('uPhone').value,
-        };
-        if (currentTab === 'students') {
-          data.class_number = parseInt(document.getElementById('uClassNum').value);
-          data.class_letter = document.getElementById('uClassLetter').value;
-          await api.users.createStudent(data);
-        } else {
-          data.subject = document.getElementById('uSubject').value;
-          data.position = document.getElementById('uPosition').value;
-          await api.users.createTeacher(data);
-        }
-        closeModal();
-        loadUsers();
-      } catch (err) { alert(err.message); }
-    }
-
-    async function toggleUser(id) {
-      try { await api.users.toggleActive(id); loadUsers(); } catch (err) { alert(err.message); }
-    }
-
-    async function deleteUser(id, name) {
-      if (!confirm(`"${name}" foydalanuvchisini o'chirishni xohlaysizmi?`)) return;
-      try { await api.users.delete(id); loadUsers(); } catch (err) { alert(err.message); }
-    }
-
+    function openAdd() { document.getElementById('modalTitle').textContent = currentTab === 'students' ? t('add_student') : t('add_teacher'); document.getElementById('userForm').reset(); document.getElementById('userModal').style.display = 'flex'; }
+    async function saveUser(e) { e.preventDefault(); try { const data = { username: document.getElementById('uUsername').value, password: document.getElementById('uPassword').value || undefined, first_name: document.getElementById('uFirstName').value, last_name: document.getElementById('uLastName').value, phone: document.getElementById('uPhone').value }; if (currentTab === 'students') { data.class_number = parseInt(document.getElementById('uClassNum').value); data.class_letter = document.getElementById('uClassLetter').value; await api.users.createStudent(data); } else { data.subject = document.getElementById('uSubject').value; data.position = document.getElementById('uPosition').value; await api.users.createTeacher(data); } closeModal(); loadUsers(); } catch (err) { alert(err.message); } }
+    async function toggleUser(id) { try { await api.users.toggleActive(id); loadUsers(); } catch (err) { alert(err.message); } }
+    async function deleteUser(id, name) { if (!confirm(`"${name}" ${t('delete_user_confirm')}`)) return; try { await api.users.delete(id); loadUsers(); } catch (err) { alert(err.message); } }
     function closeModal() { document.getElementById('userModal').style.display = 'none'; }
-
     loadUsers();
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bosh sahifa - Kutubxona</title>
+  <title data-i18n="nav_home">Bosh sahifa</title>
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
@@ -12,83 +12,76 @@
     <main class="main-content">
       <div class="page-header">
         <h1 id="greeting">Bosh sahifa</h1>
-        <p>Kutubxona tizimiga xush kelibsiz</p>
+        <p data-i18n="app_desc">Kutubxona tizimiga xush kelibsiz</p>
       </div>
 
       <div class="stats-grid" id="myStats">
         <div class="stat-card">
           <div class="stat-icon">📖</div>
           <div class="stat-value" id="statBorrowed">0</div>
-          <div class="stat-label">Olingan kitoblar</div>
+          <div class="stat-label" data-i18n="borrowed_books">Olingan kitoblar</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">📋</div>
           <div class="stat-value" id="statReserved">0</div>
-          <div class="stat-label">Bronlar</div>
+          <div class="stat-label" data-i18n="my_reservations">Bronlar</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon">🔔</div>
           <div class="stat-value" id="statNotifications">0</div>
-          <div class="stat-label">O'qilmagan xabarlar</div>
+          <div class="stat-label" data-i18n="notifications">O'qilmagan xabarlar</div>
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <div class="card">
           <div class="card-header">
-            <h3>Oxirgi kitoblar</h3>
-            <a href="books.html" class="btn btn-sm btn-outline">Barchasi</a>
+            <h3 data-i18n="recent_books">Oxirgi kitoblar</h3>
+            <a href="books.html" class="btn btn-sm btn-outline" data-i18n="all">Barchasi</a>
           </div>
-          <div class="card-body" id="recentBooks">
-            <div class="loading-spinner"><div class="spinner"></div></div>
-          </div>
+          <div class="card-body" id="recentBooks"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
-
         <div class="card">
           <div class="card-header">
-            <h3>Oxirgi xabarlar</h3>
-            <a href="profile.html" class="btn btn-sm btn-outline">Barchasi</a>
+            <h3 data-i18n="recent_notifications">Oxirgi xabarlar</h3>
+            <a href="profile.html" class="btn btn-sm btn-outline" data-i18n="all">Barchasi</a>
           </div>
-          <div class="card-body" id="recentNotifs" style="max-height:400px;overflow-y:auto;">
-            <div class="loading-spinner"><div class="spinner"></div></div>
-          </div>
+          <div class="card-body" id="recentNotifs" style="max-height:400px;overflow-y:auto;"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
       </div>
     </main>
   </div>
 
+  <script src="../../js/i18n.js"></script>
   <script src="../../js/api.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/app.js"></script>
   <script>
     if (!isLoggedIn() || isAdmin()) { window.location.href = '../../'; }
     renderSidebar();
+    applyLangToElements();
     loadDashboard();
+
+    function refreshPage() { loadDashboard(); applyLangToElements(); }
 
     async function loadDashboard() {
       const user = getUser();
-      document.getElementById('greeting').textContent = `Xush kelibsiz, ${getUserFullName(user)}!`;
+      document.getElementById('greeting').textContent = t('welcome') + ', ' + getUserFullName(user) + '!';
 
       try {
         const [borrowings, reservations, notifs, notifCount] = await Promise.all([
-          api.borrowing.my(),
-          api.reservations.list(),
-          api.notifications.list(),
-          api.notifications.unreadCount(),
+          api.borrowing.my(), api.reservations.list(), api.notifications.list(), api.notifications.unreadCount(),
         ]);
 
-        const activeBorrowed = borrowings.filter(b => b.status === 'borrowed').length;
-        const activeReserved = reservations.filter(r => r.status === 'reserved').length;
-
-        document.getElementById('statBorrowed').textContent = activeBorrowed;
-        document.getElementById('statReserved').textContent = activeReserved;
+        document.getElementById('statBorrowed').textContent = borrowings.filter(b => b.status === 'borrowed').length;
+        document.getElementById('statReserved').textContent = reservations.filter(r => r.status === 'reserved').length;
         document.getElementById('statNotifications').textContent = notifCount.count;
 
-        const booksContainer = document.getElementById('recentBooks');
+        const bc = document.getElementById('recentBooks');
         if (borrowings.length === 0) {
-          showEmpty(booksContainer, '📖', 'Hali kitob yo\'q', 'Siz hali kitob olmadingiz');
+          showEmpty(bc, '📖', t('no_books_yet'), t('no_books_desc'));
         } else {
-          booksContainer.innerHTML = borrowings.slice(0, 5).map((b, i) => `
+          bc.innerHTML = borrowings.slice(0, 5).map((b, i) => `
             <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6;">
               <div style="width:40px;height:40px;border-radius:8px;background:${getBookColor(i)};display:flex;align-items:center;justify-content:center;color:white;font-size:18px;">📖</div>
               <div style="flex:1;">
@@ -100,11 +93,11 @@
           `).join('');
         }
 
-        const notifsContainer = document.getElementById('recentNotifs');
+        const nc = document.getElementById('recentNotifs');
         if (notifs.length === 0) {
-          showEmpty(notifsContainer, '🔔', 'Xabarlar yo\'q', 'Hali xabarlar yo\'q');
+          showEmpty(nc, '🔔', t('no_notifications'), t('no_notifications_desc'));
         } else {
-          notifsContainer.innerHTML = notifs.slice(0, 10).map(n => `
+          nc.innerHTML = notifs.slice(0, 10).map(n => `
             <div class="notification-item ${n.is_read ? '' : 'unread'}">
               <div class="notif-title">${n.title}</div>
               <div class="notif-message">${n.message}</div>
@@ -112,9 +105,7 @@
             </div>
           `).join('');
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
   </script>
 </body>

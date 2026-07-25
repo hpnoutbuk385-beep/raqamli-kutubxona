@@ -3,76 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kutubxona - Kirish</title>
+  <title data-i18n="app_name">Maktab Kutubxonasi</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="login-page" id="loginPage">
     <div class="login-container">
+      <div class="login-lang" id="loginLang"></div>
       <div class="login-logo">
         <div class="logo-icon">📚</div>
-        <h1>Maktab Kutubxonasi</h1>
-        <p>Library Management System</p>
+        <h1 data-i18n="app_name">Maktab Kutubxonasi</h1>
+        <p data-i18n="app_desc">Library Management System</p>
       </div>
 
       <div class="tabs">
-        <button class="tab active" onclick="showTab('login')">Kirish</button>
-        <button class="tab" onclick="showTab('register')">Ro'yxatdan o'tish</button>
+        <button class="tab active" onclick="showTab('login')" data-i18n="login">Kirish</button>
+        <button class="tab" onclick="showTab('register')" data-i18n="register">Ro'yxatdan o'tish</button>
       </div>
 
       <div id="errorAlert" class="alert alert-error" style="display:none"></div>
 
-      <!-- LOGIN -->
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label>Login</label>
-          <input type="text" class="form-control" id="loginUsername" placeholder="Loginni kiriting" required>
+          <label data-i18n="username">Login</label>
+          <input type="text" class="form-control" id="loginUsername" data-i18n-placeholder="login_placeholder" placeholder="Loginni kiriting" required>
         </div>
         <div class="form-group">
-          <label>Parol</label>
-          <input type="password" class="form-control" id="loginPassword" placeholder="Parolni kiriting" required>
+          <label data-i18n="password">Parol</label>
+          <input type="password" class="form-control" id="loginPassword" data-i18n-placeholder="password_placeholder" placeholder="Parolni kiriting" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn">Kirish</button>
-        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
-          Test: admin / admin123
-        </p>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn" data-i18n="login_btn">Kirish</button>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280" data-i18n="test_hint">Test: admin / admin123</p>
       </form>
 
-      <!-- REGISTER -->
       <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
         <div class="form-group">
-          <label>Foydalanuvchi turi</label>
+          <label data-i18n="user_type">Foydalanuvchi turi</label>
           <select class="form-control" id="regRole" onchange="toggleRegFields()">
-            <option value="student">O'quvchi</option>
-            <option value="teacher">O'qituvchi</option>
+            <option value="student" data-i18n="student">O'quvchi</option>
+            <option value="teacher" data-i18n="teacher">O'qituvchi</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Login</label>
-          <input type="text" class="form-control" id="regUsername" placeholder="Login yarating" required>
+          <label data-i18n="username">Login</label>
+          <input type="text" class="form-control" id="regUsername" data-i18n-placeholder="login_placeholder" placeholder="Login yarating" required>
         </div>
         <div class="form-group">
-          <label>Parol</label>
-          <input type="password" class="form-control" id="regPassword" placeholder="Parol yarating" required>
+          <label data-i18n="password">Parol</label>
+          <input type="password" class="form-control" id="regPassword" data-i18n-placeholder="password_placeholder" placeholder="Parol yarating" required>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Ism</label>
-            <input type="text" class="form-control" id="regFirstName" placeholder="Ism" required>
+            <label data-i18n="first_name">Ism</label>
+            <input type="text" class="form-control" id="regFirstName" data-i18n-placeholder="first_name" placeholder="Ism" required>
           </div>
           <div class="form-group">
-            <label>Familiya</label>
-            <input type="text" class="form-control" id="regLastName" placeholder="Familiya" required>
+            <label data-i18n="last_name">Familiya</label>
+            <input type="text" class="form-control" id="regLastName" data-i18n-placeholder="last_name" placeholder="Familiya" required>
           </div>
         </div>
         <div class="form-group">
-          <label>Telefon</label>
-          <input type="text" class="form-control" id="regPhone" placeholder="+998 XX XXX XX XX">
+          <label data-i18n="phone">Telefon</label>
+          <input type="text" class="form-control" id="regPhone" data-i18n-placeholder="phone_placeholder" placeholder="+998 XX XXX XX XX">
         </div>
         <div id="studentFields">
           <div class="form-row">
             <div class="form-group">
-              <label>Sinf</label>
+              <label data-i18n="class">Sinf</label>
               <select class="form-control" id="regClassNumber">
                 <option value="1">1-sinf</option><option value="2">2-sinf</option><option value="3">3-sinf</option>
                 <option value="4">4-sinf</option><option value="5">5-sinf</option><option value="6">6-sinf</option>
@@ -81,7 +78,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Sinf harfi</label>
+              <label data-i18n="class_letter">Sinf harfi</label>
               <select class="form-control" id="regClassLetter">
                 <option value="A">A</option><option value="B" selected>B</option><option value="V">V</option>
                 <option value="G">G</option><option value="E">E</option>
@@ -91,19 +88,20 @@
         </div>
         <div id="teacherFields" style="display:none">
           <div class="form-group">
-            <label>Fan</label>
-            <input type="text" class="form-control" id="regSubject" placeholder="Fan nomi">
+            <label data-i18n="subject">Fan</label>
+            <input type="text" class="form-control" id="regSubject" data-i18n-placeholder="subject_placeholder" placeholder="Fan nomi">
           </div>
           <div class="form-group">
-            <label>Lavozim</label>
-            <input type="text" class="form-control" id="regPosition" placeholder="Lavozim">
+            <label data-i18n="position">Lavozim</label>
+            <input type="text" class="form-control" id="regPosition" data-i18n-placeholder="position_placeholder" placeholder="Lavozim">
           </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-full btn-lg" id="regBtn">Ro'yxatdan o'tish</button>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="regBtn" data-i18n="register_btn">Ro'yxatdan o'tish</button>
       </form>
     </div>
   </div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script>
@@ -112,6 +110,25 @@
       if (user.role === 'admin') window.location.href = 'pages/admin/dashboard.html';
       else window.location.href = 'pages/dashboard.html';
     }
+
+    function renderLoginLang() {
+      const container = document.getElementById('loginLang');
+      container.innerHTML = langOptionsList().map(l => `
+        <button class="lang-btn ${l.code === getLang() ? 'active' : ''}" onclick="loginSwitchLang('${l.code}')">
+          ${l.flag} ${l.label}
+        </button>
+      `).join('');
+    }
+
+    function loginSwitchLang(lang) {
+      setLanguage(lang);
+      applyLangToElements();
+      renderLoginLang();
+      document.title = t('app_name');
+    }
+
+    renderLoginLang();
+    applyLangToElements();
 
     function showTab(tab) {
       document.querySelectorAll('.tab').forEach((t, i) => {
@@ -143,7 +160,7 @@
       hideError();
       const btn = document.getElementById('loginBtn');
       btn.disabled = true;
-      btn.textContent = 'Kirilmoqda...';
+      btn.textContent = t('logging_in');
       try {
         const data = await api.auth.login(
           document.getElementById('loginUsername').value,
@@ -156,7 +173,7 @@
         showError(err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Kirish';
+        btn.textContent = t('login_btn');
       }
     }
 
@@ -165,7 +182,7 @@
       hideError();
       const btn = document.getElementById('regBtn');
       btn.disabled = true;
-      btn.textContent = 'Yaratilmoqda...';
+      btn.textContent = t('creating');
       try {
         const role = document.getElementById('regRole').value;
         const profile = {};
@@ -195,7 +212,7 @@
         showError(err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Ro\'yxatdan o\'tish';
+        btn.textContent = t('register_btn');
       }
     }
   </script>

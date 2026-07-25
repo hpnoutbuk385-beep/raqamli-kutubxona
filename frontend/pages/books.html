@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kitoblar - Kutubxona</title>
+  <title data-i18n="nav_books">Kitoblar</title>
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
@@ -11,65 +11,46 @@
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-header">
-        <h1>📚 Kitoblar</h1>
-        <p>Kutubxonadagi barcha kitoblar</p>
+        <h1 data-i18n="books_title">📚 Kitoblar</h1>
+        <p data-i18n="books_subtitle">Kutubxonadagi barcha kitoblar</p>
       </div>
-
       <div class="search-bar">
         <div class="search-input">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="Kitob qidirish... (nom, muallif, ISBN)" oninput="debounceSearch()">
+          <input type="text" id="searchInput" data-i18n-placeholder="book_search" placeholder="Kitob qidirish..." oninput="debounceSearch()">
         </div>
         <select class="form-control" id="categoryFilter" onchange="loadBooks()" style="max-width:200px;">
-          <option value="">Barcha kategoriyalar</option>
+          <option value="" data-i18n="all_categories">Barcha kategoriyalar</option>
         </select>
       </div>
-
-      <div id="booksContainer">
-        <div class="loading-spinner"><div class="spinner"></div></div>
-      </div>
-
+      <div id="booksContainer"><div class="loading-spinner"><div class="spinner"></div></div></div>
       <div id="bookModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeBookModal()">
         <div class="modal">
-          <div class="modal-header">
-            <h2 id="modalTitle">Kitob</h2>
-            <button class="modal-close" onclick="closeBookModal()">&times;</button>
-          </div>
+          <div class="modal-header"><h2 id="modalTitle">Kitob</h2><button class="modal-close" onclick="closeBookModal()">&times;</button></div>
           <div class="modal-body" id="modalBody"></div>
           <div class="modal-footer" id="modalFooter"></div>
         </div>
       </div>
     </main>
   </div>
-
+  <script src="../../js/i18n.js"></script>
   <script src="../../js/api.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/app.js"></script>
   <script>
     if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
-    renderSidebar();
-
+    renderSidebar(); applyLangToElements();
     let searchTimeout;
-
+    function refreshPage() { loadBooks(); applyLangToElements(); }
     async function init() {
       try {
         const cats = await api.books.categories();
         const sel = document.getElementById('categoryFilter');
-        cats.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.textContent = c.name;
-          sel.appendChild(opt);
-        });
+        cats.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; sel.appendChild(o); });
       } catch(e) {}
       loadBooks();
     }
-
-    function debounceSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(loadBooks, 300);
-    }
-
+    function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(loadBooks, 300); }
     async function loadBooks() {
       const container = document.getElementById('booksContainer');
       showLoading(container);
@@ -79,22 +60,17 @@
         const cat = document.getElementById('categoryFilter').value;
         if (search) params.search = search;
         if (cat) params.category = cat;
-
         const books = await api.books.list(params);
-        if (books.length === 0) {
-          showEmpty(container, '📚', 'Kitoblar topilmadi', 'Qidiruv so\'zlarini o\'zgartirib ko\'ring');
-          return;
-        }
-
+        if (books.length === 0) { showEmpty(container, '📚', t('book_not_found'), t('book_not_found_desc')); return; }
         container.innerHTML = `<div class="book-grid">${books.map((b, i) => `
           <div class="book-card" onclick="showBook('${b.id}')">
             <div class="book-cover" style="background:${getBookColor(i)}">
               <span>📖</span>
-              ${b.available_copies > 0 ? '<span class="badge badge-available" style="position:absolute;top:8px;right:8px;">Mavjud</span>' : '<span class="badge badge-borrowed" style="position:absolute;top:8px;right:8px;">Yo\'q</span>'}
+              ${b.available_copies > 0 ? `<span class="badge badge-available" style="position:absolute;top:8px;right:8px;">${t('available')}</span>` : `<span class="badge badge-borrowed" style="position:absolute;top:8px;right:8px;">${t('unavailable')}</span>`}
             </div>
             <div class="book-info">
               <div class="book-title">${b.title}</div>
-              <div class="book-author">${b.author_name || 'Noma\'lum muallif'}</div>
+              <div class="book-author">${b.author_name || '-'}</div>
               <div class="book-meta">
                 <span class="book-shelf">📍 ${b.shelf_number || '-'}</span>
                 <span class="book-available" style="color:${b.available_copies > 0 ? '#16a34a' : '#dc2626'}">${b.available_copies}/${b.total_copies}</span>
@@ -102,11 +78,8 @@
             </div>
           </div>
         `).join('')}</div>`;
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
+      } catch (err) { container.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
-
     async function showBook(id) {
       const modal = document.getElementById('bookModal');
       const body = document.getElementById('modalBody');
@@ -114,7 +87,6 @@
       body.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
       footer.innerHTML = '';
       modal.style.display = 'flex';
-
       try {
         const book = await api.books.get(id);
         document.getElementById('modalTitle').textContent = book.title;
@@ -123,45 +95,30 @@
             <div style="width:120px;height:160px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:40px;color:white;">📖</div>
             <div>
               <h3 style="font-size:18px;margin-bottom:8px;">${book.title}</h3>
-              <p style="color:#6b7280;margin-bottom:4px;">✍️ ${book.author_name || 'Noma\'lum'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">📁 ${book.category_name || 'Noma\'lum'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">✍️ ${book.author_name || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">📁 ${book.category_name || '-'}</p>
               <p style="color:#6b7280;margin-bottom:4px;">📄 ${book.publisher || '-'}</p>
               <p style="color:#6b7280;margin-bottom:4px;">📅 ${book.published_year || '-'}</p>
               <p style="color:#6b7280;margin-bottom:4px;">🌐 ${book.language || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">📍 Javon: ${book.shelf_number || '-'}</p>
-              <p style="margin-top:8px;">
-                Mavjud: <strong style="color:${book.available_copies > 0 ? '#16a34a' : '#dc2626'};">${book.available_copies} / ${book.total_copies}</strong>
-              </p>
+              <p style="color:#6b7280;margin-bottom:4px;">📍 ${t('shelf')}: ${book.shelf_number || '-'}</p>
+              <p style="margin-top:8px;">${t('available_copies')}: <strong style="color:${book.available_copies > 0 ? '#16a34a' : '#dc2626'};">${book.available_copies} / ${book.total_copies}</strong></p>
             </div>
           </div>
-          ${book.description ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;"><strong>Tavsif:</strong><p style="color:#6b7280;margin-top:4px;">${book.description}</p></div>` : ''}
-        `;
-
-        if (book.available_copies > 0) {
-          footer.innerHTML = `<button class="btn btn-primary" onclick="reserveBook('${book.id}')">📚 BRON QILISH</button>`;
-        } else {
-          footer.innerHTML = `<button class="btn btn-outline" disabled>Kitob mavjud emas</button>`;
-        }
-      } catch (err) {
-        body.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
+          ${book.description ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;"><strong>${t('description')}:</strong><p style="color:#6b7280;margin-top:4px;">${book.description}</p></div>` : ''}`;
+        footer.innerHTML = book.available_copies > 0
+          ? `<button class="btn btn-primary" onclick="reserveBook('${book.id}')">📚 ${t('reserve_btn')}</button>`
+          : `<button class="btn btn-outline" disabled>${t('book_unavailable')}</button>`;
+      } catch (err) { body.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
-
-    function closeBookModal() {
-      document.getElementById('bookModal').style.display = 'none';
-    }
-
+    function closeBookModal() { document.getElementById('bookModal').style.display = 'none'; }
     async function reserveBook(bookId) {
       try {
         const result = await api.reservations.create(bookId);
         closeBookModal();
-        alert(`Kitob bron qilindi!\n\nReservation ID: ${result.reservation_id}\n\nQR kod olish uchun "Bronlarim" sahifasiga kiring.`);
+        alert(t('book_reserved') + '\n\n' + t('reservation_id') + ': ' + result.reservation_id + '\n\n' + t('qr_hint'));
         window.location.href = 'reservations.html';
-      } catch (err) {
-        alert('Xatolik: ' + err.message);
-      }
+      } catch (err) { alert(err.message); }
     }
-
     init();
   </script>
 </body>

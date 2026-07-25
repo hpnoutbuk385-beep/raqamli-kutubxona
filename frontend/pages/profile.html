@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil - Kutubxona</title>
+  <title data-i18n="nav_profile">Profil</title>
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
@@ -11,121 +11,57 @@
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-header">
-        <h1>👤 Profil</h1>
-        <p>Shaxsiy ma'lumotlaringiz</p>
+        <h1 data-i18n="profile_title">👤 Profil</h1>
+        <p data-i18n="profile_subtitle">Shaxsiy ma'lumotlaringiz</p>
       </div>
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <div class="card">
-          <div class="card-header"><h3>Shaxsiy ma'lumotlar</h3></div>
-          <div class="card-body" id="profileInfo">
-            <div class="loading-spinner"><div class="spinner"></div></div>
-          </div>
+          <div class="card-header"><h3 data-i18n="personal_info">Shaxsiy ma'lumotlar</h3></div>
+          <div class="card-body" id="profileInfo"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
-
         <div class="card">
-          <div class="card-header"><h3>🔔 Bildirishnomalar</h3></div>
-          <div class="card-body" id="notificationsList" style="max-height:500px;overflow-y:auto;">
-            <div class="loading-spinner"><div class="spinner"></div></div>
-          </div>
+          <div class="card-header"><h3>🔔 <span data-i18n="all_notifications">Bildirishnomalar</span></h3></div>
+          <div class="card-body" id="notificationsList" style="max-height:500px;overflow-y:auto;"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
       </div>
     </main>
   </div>
-
+  <script src="../../js/i18n.js"></script>
   <script src="../../js/api.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/app.js"></script>
   <script>
     if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
-    renderSidebar();
-    loadProfile();
-    loadNotifications();
-
+    renderSidebar(); applyLangToElements();
+    function refreshPage() { loadProfile(); loadNotifications(); applyLangToElements(); }
     async function loadProfile() {
       try {
-        const user = await api.auth.me();
-        const p = user.profile;
-        const container = document.getElementById('profileInfo');
-
-        let profileHTML = `
-          <div style="text-align:center;margin-bottom:20px;">
-            <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:28px;font-weight:700;">${getUserInitials(user)}</div>
-            <h3 style="margin-top:8px;">${getUserFullName(user)}</h3>
-            <span class="badge ${user.role === 'student' ? 'badge-student' : 'badge-teacher'}">${user.role === 'student' ? 'O\'quvchi' : 'O\'qituvchi'}</span>
-          </div>
-        `;
-
+        const user = await api.auth.me(); const p = user.profile; const container = document.getElementById('profileInfo');
+        let h = `<div style="text-align:center;margin-bottom:20px;">
+          <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:28px;font-weight:700;">${getUserInitials(user)}</div>
+          <h3 style="margin-top:8px;">${getUserFullName(user)}</h3>
+          <span class="badge ${user.role === 'student' ? 'badge-student' : 'badge-teacher'}">${t(user.role)}</span></div>`;
         if (p) {
-          profileHTML += `
-            <div style="display:grid;gap:12px;">
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Ism</span><strong>${p.first_name}</strong>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Familiya</span><strong>${p.last_name}</strong>
-              </div>
-              ${p.father_name ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Otasining ismi</span><strong>${p.father_name}</strong>
-              </div>` : ''}
-              ${p.phone ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Telefon</span><strong>${p.phone}</strong>
-              </div>` : ''}
-              ${user.role === 'student' && p.class_number ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Sinf</span><strong>${p.class_number}-${p.class_letter}</strong>
-              </div>` : ''}
-              ${p.student_id ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">O'quvchi ID</span><strong><code>${p.student_id}</code></strong>
-              </div>` : ''}
-              ${p.teacher_id ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">O'qituvchi ID</span><strong><code>${p.teacher_id}</code></strong>
-              </div>` : ''}
-              ${p.subject ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Fan</span><strong>${p.subject}</strong>
-              </div>` : ''}
-              ${p.position ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <span style="color:#6b7280;">Lavozim</span><strong>${p.position}</strong>
-              </div>` : ''}
-              <div style="display:flex;justify-content:space-between;padding:8px 0;">
-                <span style="color:#6b7280;">Login</span><strong>${user.username}</strong>
-              </div>
-            </div>
-          `;
+          const row = (label, val) => val ? `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;"><span style="color:#6b7280;">${label}</span><strong>${val}</strong></div>` : '';
+          h += `<div style="display:grid;gap:0;">
+            ${row(t('first_name'), p.first_name)}${row(t('last_name'), p.last_name)}${row(t('father_name'), p.father_name)}
+            ${row(t('phone'), p.phone)}${user.role === 'student' && p.class_number ? row(t('class'), p.class_number + '-' + p.class_letter) : ''}
+            ${row(t('student') + ' ID', p.student_id)}${row(t('teacher') + ' ID', p.teacher_id)}
+            ${p.subject ? row(t('subject'), p.subject) : ''}${p.position ? row(t('position'), p.position) : ''}
+            ${row(t('login_label'), user.username)}</div>`;
         }
-        container.innerHTML = profileHTML;
-      } catch (err) {
-        document.getElementById('profileInfo').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
+        container.innerHTML = h;
+      } catch (err) { document.getElementById('profileInfo').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
-
     async function loadNotifications() {
       try {
-        const notifs = await api.notifications.list();
-        const container = document.getElementById('notificationsList');
-
-        if (notifs.length === 0) {
-          showEmpty(container, '🔔', 'Xabarlar yo\'q', 'Hali bildirishnoma yo\'q');
-          return;
-        }
-
-        container.innerHTML = notifs.map(n => `
-          <div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="markNotifRead('${n.id}', this)">
-            <div class="notif-title">${n.title}</div>
-            <div class="notif-message">${n.message}</div>
-            <div class="notif-time">${formatDateTime(n.created_at)}</div>
-          </div>
-        `).join('');
-      } catch (err) {
-        document.getElementById('notificationsList').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
+        const notifs = await api.notifications.list(); const container = document.getElementById('notificationsList');
+        if (notifs.length === 0) { showEmpty(container, '🔔', t('no_notifications'), t('no_notifications_desc')); return; }
+        container.innerHTML = notifs.map(n => `<div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="markNotifRead('${n.id}', this)"><div class="notif-title">${n.title}</div><div class="notif-message">${n.message}</div><div class="notif-time">${formatDateTime(n.created_at)}</div></div>`).join('');
+      } catch (err) { document.getElementById('notificationsList').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
-
-    async function markNotifRead(id, el) {
-      try {
-        await api.notifications.markRead(id);
-        el.classList.remove('unread');
-      } catch (e) {}
-    }
+    async function markNotifRead(id, el) { try { await api.notifications.markRead(id); el.classList.remove('unread'); } catch (e) {} }
+    loadProfile(); loadNotifications();
   </script>
 </body>
 </html>

@@ -753,3 +753,64 @@ tr:hover { background: var(--gray-50); }
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.sidebar-lang {
+  padding: 8px 20px;
+  display: flex;
+  gap: 4px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin: 8px 0;
+}
+
+.lang-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gray-400);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.lang-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.login-lang {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.login-lang .lang-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border: 2px solid var(--gray-200);
+  border-radius: 20px;
+  background: white;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-lang .lang-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.login-lang .lang-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
