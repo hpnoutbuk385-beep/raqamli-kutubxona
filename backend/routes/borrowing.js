@@ -16,7 +16,7 @@ const JOIN_SQL = `FROM borrowings bw JOIN books b ON bw.book_id = b.id LEFT JOIN
   JOIN users u ON bw.user_id = u.id LEFT JOIN student_profiles sp ON u.id = sp.user_id
   LEFT JOIN teacher_profiles tp ON u.id = tp.user_id`;
 
-const COLUMNS = `bw.*, b.title as book_title, b.isbn, a.name as author_name,
+const COLUMNS = `bw.*, b.title as book_title, b.isbn, a.name as author_name, b.daily_fee as book_daily_fee,
   CASE WHEN sp.user_id IS NOT NULL THEN sp.first_name || ' ' || sp.last_name
        WHEN tp.user_id IS NOT NULL THEN tp.first_name || ' ' || tp.last_name
        ELSE u.username END as user_name,
@@ -32,7 +32,7 @@ router.post('/confirm', authenticate, authorize('admin'), async (req, res) => {
     if (!qr_token) return res.status(400).json({ error: 'QR token kiriting' });
 
     const reservationResult = await db.query(
-      `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name,
+      `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name, b.daily_fee as book_daily_fee,
         CASE WHEN sp.user_id IS NOT NULL THEN sp.first_name || ' ' || sp.last_name
              WHEN tp.user_id IS NOT NULL THEN tp.first_name || ' ' || tp.last_name
              ELSE u.username END as user_name,
@@ -64,14 +64,20 @@ router.post('/confirm', authenticate, authorize('admin'), async (req, res) => {
       await db.query("UPDATE book_copies SET status = 'borrowed' WHERE id = ?", [reservation.book_copy_id]);
     }
 
+    const dueDays = reservation.due_days || 7;
+    const totalPrice = reservation.total_price || (dueDays * (reservation.book_daily_fee || 1000));
+
     const borrowingId = 'bw-' + uuidv4().slice(0, 8);
     await db.query(
-      "INSERT INTO borrowings (id, reservation_id, user_id, book_id, book_copy_id, return_id, status) VALUES (?, ?, ?, ?, ?, ?, 'borrowed')",
-      [borrowingId, reservation.id, reservation.borrower_user_id, reservation.book_id, reservation.book_copy_id, returnId]);
+      `INSERT INTO borrowings (id, reservation_id, user_id, book_id, book_copy_id, return_id, status, due_days, total_price)
+       VALUES (?, ?, ?, ?, ?, ?, 'borrowed', ?, ?)`,
+      [borrowingId, reservation.id, reservation.borrower_user_id, reservation.book_id, reservation.book_copy_id, returnId, dueDays, totalPrice]);
 
     await db.query(
-      "INSERT INTO notifications (id, user_id, title, message) VALUES (?, ?, ?, ?)",
-      [uuidv4(), reservation.borrower_user_id, 'Kitob berildi', `"${reservation.book_title}" kitobi sizga muvaffaqiyatli berildi. Qaytarish ID: ${returnId}`]);
+      "INSERT INTO notifications (id, user_id, title, message, type) VALUES (?, ?, ?, ?, ?)",
+      [uuidv4(), reservation.borrower_user_id, 'Kitob berildi',
+       `"${reservation.book_title}" kitobi sizga muvaffaqiyatli berildi. Qaytarish ID: ${returnId}. Muddat: ${dueDays} kun. Narx: ${totalPrice} so'm.`,
+       'borrow']);
 
     const borrowingResult = await db.query('SELECT * FROM borrowings WHERE id = ?', [borrowingId]);
 
@@ -81,6 +87,9 @@ router.post('/confirm', authenticate, authorize('admin'), async (req, res) => {
       return_id: returnId,
       book_title: reservation.book_title,
       user_name: reservation.user_name,
+      due_days: dueDays,
+      total_price: totalPrice,
+      due_date: borrowingResult.rows[0].due_date,
     });
   } catch (err) {
     console.error('Confirm borrowing error:', err);
@@ -123,26 +132,46 @@ router.post('/return', authenticate, authorize('admin'), async (req, res) => {
 
     const borrowing = result.rows[0];
 
-    await db.query("UPDATE borrowings SET status = 'returned', returned_at = datetime('now') WHERE id = ?", [borrowing.id]);
+    let penalty = 0;
+    const dueDate = new Date(borrowing.due_date);
+    const now = new Date();
+    if (now > dueDate) {
+      const overdueDays = Math.ceil((now - dueDate) / (1000 * 60 * 60 * 24));
+      penalty = overdueDays * (borrowing.book_daily_fee || 1000) * 2;
+    }
+
+    await db.query(
+      "UPDATE borrowings SET status = 'returned', returned_at = datetime('now'), penalty = ? WHERE id = ?",
+      [penalty, borrowing.id]);
     await db.query("UPDATE reservations SET status = 'returned' WHERE id = ?", [borrowing.reservation_id]);
     await db.query('UPDATE books SET available_copies = available_copies + 1 WHERE id = ?', [borrowing.book_id]);
     if (borrowing.book_copy_id) {
       await db.query("UPDATE book_copies SET status = 'available' WHERE id = ?", [borrowing.book_copy_id]);
     }
 
+    let notifMsg = `"${borrowing.book_title}" kitobi kutubxonaga muvaffaqiyatli qaytarildi. Rahmat!`;
+    if (penalty > 0) {
+      notifMsg += ` Kechikish uchun jarima: ${penalty} so'm.`;
+      await db.query(
+        "INSERT INTO notifications (id, user_id, title, message, type) VALUES (?, ?, ?, ?, ?)",
+        [uuidv4(), borrowing.borrower_user_id, 'Jarima', `${borrowing.book_title} kitobi kech qaytarildi. Jarima: ${penalty} so'm.`, 'penalty']);
+    }
     await db.query(
-      "INSERT INTO notifications (id, user_id, title, message) VALUES (?, ?, ?, ?)",
-      [uuidv4(), borrowing.borrower_user_id, 'Kitob qaytarildi', `"${borrowing.book_title}" kitobi kutubxonaga muvaffaqiyatli qaytarildi. Rahmat!`]);
+      "INSERT INTO notifications (id, user_id, title, message, type) VALUES (?, ?, ?, ?, ?)",
+      [uuidv4(), borrowing.borrower_user_id, 'Kitob qaytarildi', notifMsg, 'return']);
 
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('uz-UZ') + ' ' + now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+    const nowDate = new Date();
+    const formattedDate = nowDate.toLocaleDateString('uz-UZ') + ' ' + nowDate.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
 
     res.json({
-      message: 'Kitob muvaffaqiyatli qaytarildi!',
+      message: penalty > 0 ? `Kitob qaytarildi. Jarima: ${penalty} so'm` : 'Kitob muvaffaqiyatli qaytarildi!',
       book_title: borrowing.book_title,
       user_name: borrowing.user_name,
       return_id: borrowing.return_id,
       returned_at: formattedDate,
+      due_days: borrowing.due_days,
+      total_price: borrowing.total_price,
+      penalty: penalty,
     });
   } catch (err) {
     console.error('Return book error:', err);
@@ -157,6 +186,34 @@ router.get('/overdue', authenticate, authorize('admin'), async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error('Get overdue error:', err);
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
+router.post('/overdue-notify', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const overdue = await db.query(
+      `SELECT ${COLUMNS} ${JOIN_SQL} WHERE bw.status = 'borrowed' AND bw.due_date < datetime('now')`);
+
+    let count = 0;
+    for (const b of overdue.rows) {
+      const overdueDays = Math.ceil((new Date() - new Date(b.due_date)) / (1000 * 60 * 60 * 24));
+      const msg = `"${b.book_title}" kitobiningz muddati ${overdueDays} kun kechdi. Iltimos, kitobni kutubxonaga qaytaring! Jarima: ${overdueDays * (b.book_daily_fee || 1000) * 2} so'm.`;
+
+      const existing = await db.query(
+        "SELECT id FROM notifications WHERE user_id = ? AND message = ? AND type = 'overdue'",
+        [b.borrower_user_id, msg]);
+      if (existing.rows.length === 0) {
+        await db.query(
+          "INSERT INTO notifications (id, user_id, title, message, type) VALUES (?, ?, ?, ?, ?)",
+          [uuidv4(), b.borrower_user_id, 'Muddat o\'tdi!', msg, 'overdue']);
+        count++;
+      }
+    }
+
+    res.json({ message: `${count} ta ogohlantirish yuborildi`, count });
+  } catch (err) {
+    console.error('Overdue notify error:', err);
     res.status(500).json({ error: 'Server xatosi' });
   }
 });

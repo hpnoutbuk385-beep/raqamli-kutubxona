@@ -90,7 +90,7 @@ function initSchema(db) {
     publisher TEXT, published_year INTEGER, language TEXT DEFAULT 'O''zbek',
     description TEXT DEFAULT '', cover_image TEXT,
     total_copies INTEGER DEFAULT 1, available_copies INTEGER DEFAULT 1,
-    shelf_number TEXT DEFAULT '',
+    shelf_number TEXT DEFAULT '', daily_fee INTEGER DEFAULT 1000,
     created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
   )`);
   db.run(`CREATE TABLE IF NOT EXISTS book_copies (
@@ -101,6 +101,7 @@ function initSchema(db) {
     id TEXT PRIMARY KEY, reservation_id TEXT UNIQUE NOT NULL,
     user_id TEXT NOT NULL, book_id TEXT NOT NULL, book_copy_id TEXT,
     qr_token TEXT UNIQUE NOT NULL, status TEXT DEFAULT 'reserved',
+    due_days INTEGER DEFAULT 7, total_price INTEGER DEFAULT 0,
     reserved_at TEXT DEFAULT (datetime('now')),
     expires_at TEXT DEFAULT (datetime('now', '+7 days'))
   )`);
@@ -109,11 +110,14 @@ function initSchema(db) {
     user_id TEXT NOT NULL, book_id TEXT NOT NULL, book_copy_id TEXT,
     return_id TEXT UNIQUE NOT NULL, borrowed_at TEXT DEFAULT (datetime('now')),
     due_date TEXT NOT NULL DEFAULT (datetime('now', '+14 days')),
+    due_days INTEGER DEFAULT 7, total_price INTEGER DEFAULT 0,
+    penalty INTEGER DEFAULT 0, penalty_paid INTEGER DEFAULT 0,
     returned_at TEXT, status TEXT DEFAULT 'borrowed'
   )`);
   db.run(`CREATE TABLE IF NOT EXISTS notifications (
     id TEXT PRIMARY KEY, user_id TEXT NOT NULL, title TEXT NOT NULL,
     message TEXT NOT NULL, is_read INTEGER DEFAULT 0,
+    type TEXT DEFAULT 'info',
     created_at TEXT DEFAULT (datetime('now'))
   )`);
 }
@@ -128,12 +132,12 @@ function seedData(db) {
   ['Alisher Navoiy','Abdulla Qodiriy',"Cho'lpon","O'tkir Hoshimov","Mukhtar A'zamov",'Erkin Vohidov','Said Ahmad','Oybek'].forEach(n => db.run(`INSERT INTO authors (name) VALUES (?)`, [n]));
   ['Adabiyot','Tarix','Falsafa','Ilmiy','Diniy','Bolalar adabiyoti',"Roman","She'r"].forEach(n => db.run(`INSERT INTO categories (name) VALUES (?)`, [n]));
   const books = [
-    ['b-001','978-9943-123-45-1','Xamsa',1,1,'Sharq',2024,"O'zbek",'Navoiyning asosiy asari',5,3,'A-12'],
-    ['b-002','978-9943-123-45-2','Mehmon',2,7,"O'qituvchi",2023,"O'zbek",'Qodiriyning romani',3,2,'B-05'],
-    ['b-003','978-9943-123-45-3','Hayot bobokalon',4,7,'Adolat',2022,"O'zbek",'Hoshimovning asari',4,4,'A-08'],
-    ['b-004','978-9943-123-45-4',"Buzilgan umidlar",3,8,'Yangi asr',2021,"O'zbek",'She\'rlar to\'plami',2,2,'C-15'],
+    ['b-001','978-9943-123-45-1','Xamsa',1,1,'Sharq',2024,"O'zbek",'Navoiyning asosiy asari',5,3,'A-12',1000],
+    ['b-002','978-9943-123-45-2','Mehmon',2,7,"O'qituvchi",2023,"O'zbek",'Qodiriyning romani',3,2,'B-05',1500],
+    ['b-003','978-9943-123-45-3','Hayot bobokalon',4,7,'Adolat',2022,"O'zbek",'Hoshimovning asari',4,4,'A-08',2000],
+    ['b-004','978-9943-123-45-4',"Buzilgan umidlar",3,8,'Yangi asr',2021,"O'zbek",'She\'rlar to\'plami',2,2,'C-15',500],
   ];
-  books.forEach(b => db.run(`INSERT INTO books (id,isbn,title,author_id,category_id,publisher,published_year,language,description,total_copies,available_copies,shelf_number) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`, b));
+  books.forEach(b => db.run(`INSERT INTO books (id,isbn,title,author_id,category_id,publisher,published_year,language,description,total_copies,available_copies,shelf_number,daily_fee) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`, b));
   [[3,'bc-001','b-001'],[2,'bc-002','b-002'],[4,'bc-003','b-003'],[2,'bc-004','b-004']].forEach(([n,prefix,bid]) => {
     for(let i=0;i<n;i++) db.run(`INSERT INTO book_copies (id,book_id,status) VALUES (?,?,?)`,[`${prefix}-${i}`,bid,'available']);
   });

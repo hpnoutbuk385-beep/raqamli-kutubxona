@@ -13,7 +13,7 @@ router.get('/', authenticate, async (req, res) => {
   try {
     let sql, params;
     if (req.user.role === 'admin') {
-      sql = `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name,
+      sql = `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name, b.daily_fee as book_daily_fee,
         CASE WHEN sp.user_id IS NOT NULL THEN sp.first_name || ' ' || sp.last_name
              WHEN tp.user_id IS NOT NULL THEN tp.first_name || ' ' || tp.last_name
              ELSE u.username END as user_name,
@@ -26,7 +26,7 @@ router.get('/', authenticate, async (req, res) => {
         LEFT JOIN teacher_profiles tp ON u.id = tp.user_id ORDER BY r.reserved_at DESC`;
       params = [];
     } else {
-      sql = `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name
+      sql = `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name, b.daily_fee as book_daily_fee
         FROM reservations r JOIN books b ON r.book_id = b.id LEFT JOIN authors a ON b.author_id = a.id
         WHERE r.user_id = ? ORDER BY r.reserved_at DESC`;
       params = [req.user.id];
@@ -41,7 +41,7 @@ router.get('/', authenticate, async (req, res) => {
 
 router.post('/', authenticate, authorize('student', 'teacher'), async (req, res) => {
   try {
-    const { book_id } = req.body;
+    const { book_id, due_days } = req.body;
     if (!book_id) return res.status(400).json({ error: 'Kitob ID kiriting' });
 
     const bookResult = await db.query('SELECT * FROM books WHERE id = ?', [book_id]);
@@ -53,6 +53,10 @@ router.post('/', authenticate, authorize('student', 'teacher'), async (req, res)
       "SELECT id FROM reservations WHERE user_id = ? AND book_id = ? AND status = 'reserved'",
       [req.user.id, book_id]);
     if (existing.rows.length > 0) return res.status(400).json({ error: 'Siz allaqachon bu kitobni bron qilgansiz' });
+
+    const days = Math.max(1, Math.min(30, parseInt(due_days) || 7));
+    const dailyFee = book.daily_fee || 1000;
+    const totalPrice = days * dailyFee;
 
     const reservationId = generateReservationId();
     const qrToken = uuidv4();
@@ -70,11 +74,12 @@ router.post('/', authenticate, authorize('student', 'teacher'), async (req, res)
 
     await db.query('UPDATE books SET available_copies = available_copies - 1 WHERE id = ?', [book_id]);
     await db.query(
-      "INSERT INTO reservations (id, reservation_id, user_id, book_id, book_copy_id, qr_token, status) VALUES (?, ?, ?, ?, ?, ?, 'reserved')",
-      [reservationDbId, reservationId, req.user.id, book_id, bookCopyId, qrToken]);
+      `INSERT INTO reservations (id, reservation_id, user_id, book_id, book_copy_id, qr_token, status, due_days, total_price)
+       VALUES (?, ?, ?, ?, ?, ?, 'reserved', ?, ?)`,
+      [reservationDbId, reservationId, req.user.id, book_id, bookCopyId, qrToken, days, totalPrice]);
 
     const result = await db.query('SELECT * FROM reservations WHERE id = ?', [reservationDbId]);
-    res.status(201).json(result.rows[0]);
+    res.status(201).json({ ...result.rows[0], book_title: book.title, daily_fee: dailyFee });
   } catch (err) {
     console.error('Create reservation error:', err);
     res.status(500).json({ error: 'Server xatosi' });
@@ -84,7 +89,7 @@ router.post('/', authenticate, authorize('student', 'teacher'), async (req, res)
 router.get('/:id/qr', authenticate, async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name,
+      `SELECT r.*, b.title as book_title, b.isbn, a.name as author_name, b.daily_fee as book_daily_fee,
         CASE WHEN sp.user_id IS NOT NULL THEN sp.first_name || ' ' || sp.last_name
              WHEN tp.user_id IS NOT NULL THEN tp.first_name || ' ' || tp.last_name
              ELSE u.username END as user_name,

@@ -114,7 +114,7 @@
 
     function renderLoginLang() {
       const container = document.getElementById('loginLang');
-      container.innerHTML = langOptionsList().map(l => `
+      container.innerHTML = langOptions().map(l => `
         <button class="lang-btn ${l.code === getLang() ? 'active' : ''}" onclick="loginSwitchLang('${l.code}')">
           ${l.flag} ${l.label}
         </button>

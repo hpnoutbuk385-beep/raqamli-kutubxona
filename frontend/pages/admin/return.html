@@ -20,7 +20,12 @@
       </div>
       <div id="resultSection" class="card mt-4" style="display:none;max-width:600px;"><div class="card-body" id="resultContent"></div></div>
       <div class="card mt-4" style="max-width:800px;">
-        <div class="card-header"><h3>⚠️ <span data-i18n="overdue_books">Kechikkan kitoblar</span></h3><button class="btn btn-sm btn-outline" onclick="loadOverdue()" data-i18n="refresh">🔄 Yangilash</button></div>
+        <div class="card-header"><h3>⚠️ <span data-i18n="overdue_books">Kechikkan kitoblar</span></h3>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-sm btn-danger" onclick="sendOverdueNotify()">📢 <span data-i18n="send_overdue_notify">Xabar yuborish</span></button>
+            <button class="btn btn-sm btn-outline" onclick="loadOverdue()" data-i18n="refresh">🔄 Yangilash</button>
+          </div>
+        </div>
         <div class="card-body" id="overdueTable"><div class="loading-spinner"><div class="spinner"></div></div></div>
       </div>
     </main>
@@ -40,12 +45,18 @@
       try {
         const result = await api.borrowing.returnBook(returnId);
         document.getElementById('resultSection').style.display = 'block';
+        const penaltyHtml = result.penalty > 0
+          ? `<div class="qr-info-row" style="background:#fee2e2;padding:8px;border-radius:6px;margin-top:8px;"><span class="qr-info-label">⚠️ ${t('penalty')}:</span><span class="qr-info-value" style="font-size:18px;font-weight:700;color:#dc2626;">${result.penalty.toLocaleString()} so'm</span></div>`
+          : '';
         document.getElementById('resultContent').innerHTML = `<div class="success-animation"><div class="check-icon">✅</div><h2 style="color:var(--success);">${t('book_returned_success')}</h2>
           <div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
             <div class="qr-info-row"><span class="qr-info-label">📚 ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
             <div class="qr-info-row"><span class="qr-info-label">👤 ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
             <div class="qr-info-row"><span class="qr-info-label">🆔 ${t('return_id')}:</span><span class="qr-info-value">${result.return_id}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">📅 ${t('returned_at')}:</span><span class="qr-info-value">${result.returned_at}</span></div></div></div>`;
+            <div class="qr-info-row"><span class="qr-info-label">📅 ${t('returned_at')}:</span><span class="qr-info-value">${result.returned_at}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">📅 ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || '-'} ${t('days_label')}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">💰 ${t('total_price')}:</span><span class="qr-info-value">${(result.total_price || 0).toLocaleString()} so'm</span></div>
+            ${penaltyHtml}</div></div>`;
         document.getElementById('returnIdInput').value = ''; loadOverdue();
       } catch (err) { document.getElementById('resultSection').style.display = 'block'; document.getElementById('resultContent').innerHTML = `<div class="alert alert-error" style="text-align:center;padding:24px;"><div style="font-size:48px;margin-bottom:12px;">❌</div><h3>${err.message}</h3></div>`; }
       finally { btn.disabled = false; btn.textContent = '🔄 ' + t('return_btn'); }
@@ -53,9 +64,19 @@
     async function loadOverdue() {
       try { const overdue = await api.borrowing.overdue(); const c = document.getElementById('overdueTable');
         if (overdue.length === 0) { showEmpty(c, '✅', t('no_overdue'), t('no_overdue_desc')); return; }
-        c.innerHTML = `<table><thead><tr><th>${t('book')}</th><th>${t('user')}</th><th>${t('class')}</th><th>${t('phone')}</th><th>${t('due_date')}</th></tr></thead><tbody>
-          ${overdue.map(b => `<tr style="background:#fee2e2;"><td><strong>${b.book_title}</strong></td><td>${b.user_name}</td><td>${b.class_name || '-'}</td><td>${b.phone || '-'}</td><td><span class="badge badge-overdue">${formatDate(b.due_date)}</span></td></tr>`).join('')}</tbody></table>`;
+        c.innerHTML = `<table><thead><tr><th>${t('book')}</th><th>${t('user')}</th><th>${t('class')}</th><th>${t('phone')}</th><th>${t('due_date')}</th><th>${t('penalty')}</th></tr></thead><tbody>
+          ${overdue.map(b => {
+            const overdueDays = Math.ceil((new Date() - new Date(b.due_date)) / (1000 * 60 * 60 * 24));
+            const pen = overdueDays * (b.book_daily_fee || 1000) * 2;
+            return `<tr style="background:#fee2e2;"><td><strong>${b.book_title}</strong></td><td>${b.user_name}</td><td>${b.class_name || '-'}</td><td>${b.phone || '-'}</td><td><span class="badge badge-overdue">${formatDate(b.due_date)} (${overdueDays} ${t('days_overdue')})</span></td><td><strong style="color:#dc2626;">${pen.toLocaleString()} so'm</strong></td></tr>`;
+          }).join('')}</tbody></table>`;
       } catch (err) { document.getElementById('overdueTable').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
+    }
+    async function sendOverdueNotify() {
+      try {
+        const result = await api.borrowing.overdueNotify();
+        alert(`✅ ${result.message}`);
+      } catch (err) { alert(err.message); }
     }
     loadOverdue();
   </script>

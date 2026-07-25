@@ -1,8 +1,7 @@
 const translations = {
   uz: {
-    // Common
     app_name: "Maktab Kutubxonasi",
-    app_desc: "Library Management System",
+    app_desc: "Kutubxona boshqaruv tizimi",
     save: "Saqlash",
     cancel: "Bekor",
     delete: "O'chirish",
@@ -22,8 +21,6 @@ const translations = {
     refresh: "Yangilash",
     add_new: "Qo'shish",
     back_to_list: "Ro'yxatga qaytish",
-
-    // Auth
     login: "Kirish",
     register: "Ro'yxatdan o'tish",
     username: "Login",
@@ -39,14 +36,10 @@ const translations = {
     test_hint: "Test: admin / admin123",
     logging_in: "Kirilmoqda...",
     creating: "Yaratilmoqda...",
-
-    // Roles
     student: "O'quvchi",
     teacher: "O'qituvchi",
     admin: "Admin",
     user_type: "Foydalanuvchi turi",
-
-    // Register
     first_name: "Ism",
     last_name: "Familiya",
     father_name: "Otasining ismi",
@@ -58,8 +51,6 @@ const translations = {
     position: "Lavozim",
     subject_placeholder: "Fan nomi",
     position_placeholder: "Lavozim",
-
-    // Sidebar
     nav_home: "Bosh sahifa",
     nav_books: "Kitoblar",
     nav_reservations: "Bronlarim",
@@ -74,8 +65,6 @@ const translations = {
     nav_management: "Boshqarish",
     nav_account: "Hisob",
     logout: "Chiqish",
-
-    // Dashboard
     welcome: "Xush kelibsiz",
     borrowed_books: "Olingan kitoblar",
     my_reservations: "Bronlarim",
@@ -89,8 +78,6 @@ const translations = {
     reserved: "Bron qilingan",
     borrowed: "Olingan",
     returned: "Qaytarilgan",
-
-    // Books
     books_title: "Kitoblar",
     books_subtitle: "Kutubxonadagi barcha kitoblar",
     book_search: "Kitob qidirish... (nom, muallif, ISBN)",
@@ -118,8 +105,15 @@ const translations = {
     book_unavailable: "Kitob mavjud emas",
     cancel_confirm: "Bronni bekor qilishni xohlaysizmi?",
     book_deleted: "kitobini o'chirishni xohlaysizmi?",
-
-    // Reservations
+    daily_fee: "Kunlik narx",
+    due_days: "Muddat (kun)",
+    total_price: "Jami narx",
+    so'm: "so'm",
+    reserve_with_terms: "Bron qilish",
+    days_label: "kun",
+    price_per_day: "kunlik",
+    penalty: "Jarima",
+    penalty_per_day: "Jarima (har kun uchun)",
     reservations_title: "Bronlarim",
     reservations_subtitle: "Sizning kitob bronlaringiz",
     reservation_not_found: "Bronlar yo'q",
@@ -132,8 +126,6 @@ const translations = {
     qr_code: "QR Kod",
     qr_scan_hint: "QR kodni kutubxonachiga ko'rsating",
     book: "Kitob",
-
-    // QR Scanner
     scan_title: "QR Scanner",
     scan_subtitle: "QR kodni skanerlang yoki token kiriting",
     scan_qr: "QR Kodni skanerlang",
@@ -148,8 +140,7 @@ const translations = {
     return_id_hint: "Kitobni qaytarishda ushbu ID kerak bo'ladi",
     new_scan: "Yangi QR skanerlash",
     reservation_info: "Bron ma'lumotlari",
-
-    // Return
+    due_info: "Muddat va narx",
     return_title: "Kitob qaytarish",
     return_subtitle: "Return ID orqali kitobni qaytarish",
     return_id_placeholder: "Masalan: AB0000001",
@@ -163,15 +154,14 @@ const translations = {
     returned_at: "Qaytarilgan",
     not_found_or_returned: "Return ID topilmadi yoki kitob allaqachon qaytarilgan",
     overdue: "Kechikkan",
-
-    // Profile
+    send_overdue_notify: "Kechikkanlarga xabar yuborish",
+    penalty_amount: "Jarima miqdori",
+    days_overdue: "kun kechdi",
     profile_title: "Profil",
     profile_subtitle: "Shaxsiy ma'lumotlaringiz",
     personal_info: "Shaxsiy ma'lumotlar",
     all_notifications: "Bildirishnomalar",
     login_label: "Login",
-
-    // Admin Dashboard
     admin_dashboard: "Dashboard",
     admin_subtitle: "Kutubxona boshqaruv paneli",
     total_books: "Jami kitoblar",
@@ -188,8 +178,6 @@ const translations = {
     active_students: "Eng faol o'quvchilar",
     times: "marta",
     items: "ta",
-
-    // Admin Books
     manage_books: "Kitoblar",
     manage_books_desc: "Kitoblarni boshqarish",
     add_book: "Kitob qo'shish",
@@ -197,8 +185,6 @@ const translations = {
     book_title_label: "Kitob nomi",
     delete_book_confirm: "kitobini o'chirishni xohlaysizmi?",
     no_books: "Kitoblar yo'q",
-
-    // Admin Users
     manage_users: "Foydalanuvchilar",
     manage_users_desc: "O'quvchilar va o'qituvchilarni boshqarish",
     students_tab: "O'quvchilar",
@@ -209,22 +195,18 @@ const translations = {
     inactive: "Nofaol",
     no_users: "Foydalanuvchilar yo'q",
     delete_user_confirm: "foydalanuvchisini o'chirishni xohlaysizmi?",
-
-    // Admin Stats
     statistics: "Statistika",
     statistics_desc: "Kutubxona statistikasi va hisobotlari",
     today_activity: "Bugungi faoliyat",
     borrowing_history: "Barcha bronlar tarixi",
     no_data_yet: "Ma'lumot yo'q",
     no_history: "Hali kitob berilmagan",
-
-    // Notifications
     notif_book_given: "Kitob berildi",
     notif_book_returned: "Kitob qaytarildi",
+    notif_overdue: "Muddat o'tdi",
+    notif_penalty: "Jarima",
     notif_book_given_msg: "kitobi sizga muvaffaqiyatli berildi. Qaytarish ID:",
     notif_book_returned_msg: "kitobi kutubxonaga muvaffaqiyatli qaytarildi. Rahmat!",
-
-    // Misc
     user: "Foydalanuvchi",
     user_code: "ID",
     borrowed_at: "Berilgan",
@@ -236,7 +218,6 @@ const translations = {
   },
 
   ru: {
-    // Common
     app_name: "Школьная Библиотека",
     app_desc: "Система Управления Библиотекой",
     save: "Сохранить",
@@ -258,8 +239,6 @@ const translations = {
     refresh: "Обновить",
     add_new: "Добавить",
     back_to_list: "Вернуться к списку",
-
-    // Auth
     login: "Вход",
     register: "Регистрация",
     username: "Логин",
@@ -275,14 +254,10 @@ const translations = {
     test_hint: "Тест: admin / admin123",
     logging_in: "Вход...",
     creating: "Создание...",
-
-    // Roles
     student: "Ученик",
     teacher: "Учитель",
     admin: "Админ",
     user_type: "Тип пользователя",
-
-    // Register
     first_name: "Имя",
     last_name: "Фамилия",
     father_name: "Отчество",
@@ -294,8 +269,6 @@ const translations = {
     position: "Должность",
     subject_placeholder: "Название предмета",
     position_placeholder: "Должность",
-
-    // Sidebar
     nav_home: "Главная",
     nav_books: "Книги",
     nav_reservations: "Мои брони",
@@ -310,8 +283,6 @@ const translations = {
     nav_management: "Управление",
     nav_account: "Аккаунт",
     logout: "Выход",
-
-    // Dashboard
     welcome: "Добро пожаловать",
     borrowed_books: "Взятые книги",
     my_reservations: "Мои брони",
@@ -325,8 +296,6 @@ const translations = {
     reserved: "Забронировано",
     borrowed: "Взято",
     returned: "Возвращено",
-
-    // Books
     books_title: "Книги",
     books_subtitle: "Все книги в библиотеке",
     book_search: "Поиск книги... (название, автор, ISBN)",
@@ -354,8 +323,15 @@ const translations = {
     book_unavailable: "Книга недоступна",
     cancel_confirm: "Вы хотите отменить бронь?",
     book_deleted: "хотите удалить книгу?",
-
-    // Reservations
+    daily_fee: "Цена за день",
+    due_days: "Срок (дней)",
+    total_price: "Общая цена",
+    so'm: "сум",
+    reserve_with_terms: "Забронировать",
+    days_label: "дней",
+    price_per_day: "в день",
+    penalty: "Штраф",
+    penalty_per_day: "Штраф (за день)",
     reservations_title: "Мои брони",
     reservations_subtitle: "Ваши бронирования книг",
     reservation_not_found: "Нет бронирований",
@@ -368,8 +344,6 @@ const translations = {
     qr_code: "QR Код",
     qr_scan_hint: "Покажите QR-код библиотекарю",
     book: "Книга",
-
-    // QR Scanner
     scan_title: "QR Сканер",
     scan_subtitle: "Отсканируйте QR-код или введите токен",
     scan_qr: "Отсканируйте QR-код",
@@ -384,8 +358,7 @@ const translations = {
     return_id_hint: "Этот ID понадобится при возврате книги",
     new_scan: "Новое сканирование",
     reservation_info: "Информация о брони",
-
-    // Return
+    due_info: "Срок и цена",
     return_title: "Возврат книг",
     return_subtitle: "Возврат книги по Return ID",
     return_id_placeholder: "Например: AB0000001",
@@ -399,15 +372,14 @@ const translations = {
     returned_at: "Возвращено",
     not_found_or_returned: "Return ID не найден или книга уже возвращена",
     overdue: "Просрочено",
-
-    // Profile
+    send_overdue_notify: "Уведомить просроченных",
+    penalty_amount: "Сумма штрафа",
+    days_overdue: "дней просрочено",
     profile_title: "Профиль",
     profile_subtitle: "Ваши личные данные",
     personal_info: "Личная информация",
     all_notifications: "Уведомления",
     login_label: "Логин",
-
-    // Admin Dashboard
     admin_dashboard: "Панель управления",
     admin_subtitle: "Панель управления библиотекой",
     total_books: "Всего книг",
@@ -424,8 +396,6 @@ const translations = {
     active_students: "Самые активные ученики",
     times: "раз",
     items: "шт",
-
-    // Admin Books
     manage_books: "Книги",
     manage_books_desc: "Управление книгами",
     add_book: "Добавить книгу",
@@ -433,8 +403,6 @@ const translations = {
     book_title_label: "Название книги",
     delete_book_confirm: "хотите удалить книгу?",
     no_books: "Нет книг",
-
-    // Admin Users
     manage_users: "Пользователи",
     manage_users_desc: "Управление учениками и учителями",
     students_tab: "Ученики",
@@ -445,22 +413,18 @@ const translations = {
     inactive: "Неактивен",
     no_users: "Нет пользователей",
     delete_user_confirm: "хотите удалить пользователя?",
-
-    // Admin Stats
     statistics: "Статистика",
     statistics_desc: "Статистика и отчёты библиотеки",
     today_activity: "Сегодняшняя активность",
     borrowing_history: "История всех выдач",
     no_data_yet: "Нет данных",
     no_history: "Книги ещё не выдавались",
-
-    // Notifications
     notif_book_given: "Книга выдана",
     notif_book_returned: "Книга возвращена",
+    notif_overdue: "Срок истёк",
+    notif_penalty: "Штраф",
     notif_book_given_msg: "была вам успешно выдана. ID возврата:",
     notif_book_returned_msg: "успешно возвращена в библиотеку. Спасибо!",
-
-    // Misc
     user: "Пользователь",
     user_code: "ID",
     borrowed_at: "Выдано",
@@ -472,7 +436,6 @@ const translations = {
   },
 
   en: {
-    // Common
     app_name: "School Library",
     app_desc: "Library Management System",
     save: "Save",
@@ -494,8 +457,6 @@ const translations = {
     refresh: "Refresh",
     add_new: "Add New",
     back_to_list: "Back to List",
-
-    // Auth
     login: "Login",
     register: "Register",
     username: "Username",
@@ -511,14 +472,10 @@ const translations = {
     test_hint: "Test: admin / admin123",
     logging_in: "Signing in...",
     creating: "Creating...",
-
-    // Roles
     student: "Student",
     teacher: "Teacher",
     admin: "Admin",
     user_type: "User Type",
-
-    // Register
     first_name: "First Name",
     last_name: "Last Name",
     father_name: "Father's Name",
@@ -530,8 +487,6 @@ const translations = {
     position: "Position",
     subject_placeholder: "Subject name",
     position_placeholder: "Position",
-
-    // Sidebar
     nav_home: "Home",
     nav_books: "Books",
     nav_reservations: "My Reservations",
@@ -546,8 +501,6 @@ const translations = {
     nav_management: "Management",
     nav_account: "Account",
     logout: "Logout",
-
-    // Dashboard
     welcome: "Welcome",
     borrowed_books: "Borrowed Books",
     my_reservations: "My Reservations",
@@ -561,8 +514,6 @@ const translations = {
     reserved: "Reserved",
     borrowed: "Borrowed",
     returned: "Returned",
-
-    // Books
     books_title: "Books",
     books_subtitle: "All books in the library",
     book_search: "Search books... (title, author, ISBN)",
@@ -590,8 +541,15 @@ const translations = {
     book_unavailable: "Book is not available",
     cancel_confirm: "Do you want to cancel this reservation?",
     book_deleted: "want to delete this book?",
-
-    // Reservations
+    daily_fee: "Daily Fee",
+    due_days: "Due Days",
+    total_price: "Total Price",
+    so'm: "so'm",
+    reserve_with_terms: "Reserve",
+    days_label: "days",
+    price_per_day: "per day",
+    penalty: "Penalty",
+    penalty_per_day: "Penalty (per day)",
     reservations_title: "My Reservations",
     reservations_subtitle: "Your book reservations",
     reservation_not_found: "No reservations",
@@ -604,8 +562,6 @@ const translations = {
     qr_code: "QR Code",
     qr_scan_hint: "Show this QR code to the librarian",
     book: "Book",
-
-    // QR Scanner
     scan_title: "QR Scanner",
     scan_subtitle: "Scan QR code or enter token",
     scan_qr: "Scan QR Code",
@@ -620,8 +576,7 @@ const translations = {
     return_id_hint: "You will need this ID when returning the book",
     new_scan: "Scan New QR",
     reservation_info: "Reservation Details",
-
-    // Return
+    due_info: "Terms & Price",
     return_title: "Book Return",
     return_subtitle: "Return book using Return ID",
     return_id_placeholder: "e.g. AB0000001",
@@ -635,15 +590,14 @@ const translations = {
     returned_at: "Returned At",
     not_found_or_returned: "Return ID not found or book already returned",
     overdue: "Overdue",
-
-    // Profile
+    send_overdue_notify: "Notify Overdue",
+    penalty_amount: "Penalty Amount",
+    days_overdue: "days overdue",
     profile_title: "Profile",
     profile_subtitle: "Your personal information",
     personal_info: "Personal Information",
     all_notifications: "Notifications",
     login_label: "Username",
-
-    // Admin Dashboard
     admin_dashboard: "Dashboard",
     admin_subtitle: "Library management panel",
     total_books: "Total Books",
@@ -660,8 +614,6 @@ const translations = {
     active_students: "Most Active Students",
     times: "times",
     items: "pcs",
-
-    // Admin Books
     manage_books: "Books",
     manage_books_desc: "Manage books",
     add_book: "Add Book",
@@ -669,8 +621,6 @@ const translations = {
     book_title_label: "Book Title",
     delete_book_confirm: "want to delete this book?",
     no_books: "No books",
-
-    // Admin Users
     manage_users: "Users",
     manage_users_desc: "Manage students and teachers",
     students_tab: "Students",
@@ -681,26 +631,240 @@ const translations = {
     inactive: "Inactive",
     no_users: "No users",
     delete_user_confirm: "want to delete this user?",
-
-    // Admin Stats
     statistics: "Statistics",
     statistics_desc: "Library statistics and reports",
     today_activity: "Today's Activity",
     borrowing_history: "All Borrowing History",
     no_data_yet: "No data yet",
     no_history: "No books have been issued yet",
-
-    // Notifications
     notif_book_given: "Book Issued",
     notif_book_returned: "Book Returned",
+    notif_overdue: "Overdue Notice",
+    notif_penalty: "Penalty",
     notif_book_given_msg: "has been issued to you. Return ID:",
     notif_book_returned_msg: "has been successfully returned to the library. Thank you!",
-
-    // Misc
     user: "User",
     user_code: "ID",
     borrowed_at: "Issued",
     due: "Due",
+    camera: "📷",
+    book_icon: "📚",
+    check_icon: "✅",
+    warning: "⚠️",
+  },
+
+  ka: {
+    app_name: "Mektep Kitaphanasi",
+    app_desc: "Kitaphana basqaruw tizimi",
+    save: "Saqław",
+    cancel: "Bekor",
+    delete: "O'chiriv",
+    edit: "Tahrirlav",
+    search: "Izlaw...",
+    loading: "Yüklenme",
+    no_data: "Ma'lumat jetim",
+    confirm: "Tasdıqlaw",
+    yes: "Ha",
+    no: "Yo'q",
+    close: "Yapiv",
+    back: "Artqa",
+    actions: "Amallar",
+    status: "Halat",
+    date: "Sana",
+    all: "Barisi",
+    refresh: "Yańılav",
+    add_new: "Qo'sıv",
+    back_to_list: "Tizimghe qaytıv",
+    login: "Kiriv",
+    register: "Tirkeliv",
+    username: "Login",
+    password: "Parol",
+    login_placeholder: "Loginni kiriting",
+    password_placeholder: "Parolni kiriting",
+    login_btn: "Kiriv",
+    register_btn: "Tirkeliv",
+    login_error: "Login yaki parol qate",
+    account_inactive: "Hisap faollashtırılmaghan",
+    username_exists: "Bu login allenqen bar",
+    fill_fields: "Login va parol kiriting",
+    test_hint: "Test: admin / admin123",
+    logging_in: "Kirilme",
+    creating: "Yaratılma",
+    student: "Oquvshı",
+    teacher: "Oqituvshı",
+    admin: "Admin",
+    user_type: "Foydalanuvshı turı",
+    first_name: "Atı",
+    last_name: "Familiya",
+    father_name: "Atasınıń atı",
+    phone: "Telefon",
+    phone_placeholder: "+998 XX XXX XX XX",
+    class: "Sınıf",
+    class_letter: "Sınıf harfi",
+    subject: "Fan",
+    position: "Lavozim",
+    subject_placeholder: "Fan nomı",
+    position_placeholder: "Lavozim",
+    nav_home: "Bas bet",
+    nav_books: "Kitaplar",
+    nav_reservations: "Bronlirim",
+    nav_profile: "Profil",
+    nav_dashboard: "Panel",
+    nav_scan: "QR Skaner",
+    nav_return: "Kitap qaytariv",
+    nav_manage_books: "Kitaplar",
+    nav_manage_users: "Foydalanuvshılar",
+    nav_statistics: " statistika",
+    nav_main: "Asasiy",
+    nav_management: "Basqarıv",
+    nav_account: "Hisap",
+    logout: "Shıǵiv",
+    welcome: "Xosh kelibsiz",
+    borrowed_books: "Alınğan kitaplar",
+    my_reservations: "Bronlirim",
+    notifications: "Xabarlar",
+    recent_books: "Sońğı kitaplar",
+    recent_notifications: "Sońğı xabarlar",
+    no_books_yet: "Hali kitap jetim",
+    no_books_desc: "Siz hali kitap almadıñız",
+    no_notifications: "Xabarlar jetim",
+    no_notifications_desc: "Hali xabar jetim",
+    reserved: "Bron qılınğan",
+    borrowed: "Alınğan",
+    returned: "Qaytarılğan",
+    books_title: "Kitaplar",
+    books_subtitle: "Kitaphanadagi bar kitaplar",
+    book_search: "Kitap izlaw... (nom, muallif, ISBN)",
+    all_categories: "Bar kategoriyalar",
+    available: "Bar",
+    unavailable: "Jetim",
+    shelf: "Javon",
+    copies: "nusxa",
+    book_not_found: "Kitaplar tapılmadı",
+    book_not_found_desc: "Qidiruv sözlerini ozgartırıp köring",
+    author: "Muallif",
+    category: "Kategoriya",
+    publisher: "Nashriyet",
+    published_year: "Nashr yılı",
+    language: "Til",
+    description: "Tavsif",
+    total_copies: "Jami nusxa",
+    available_copies: "Mavjud",
+    isbn: "ISBN",
+    shelf_number: "Javon raqamı",
+    reserve_btn: "BRON QILIV",
+    book_reserved: "Kitap bron qılındı!",
+    reservation_id: "Reservation ID",
+    qr_hint: "QR kod olish úshin 'Bronlirim' betine kiring",
+    book_unavailable: "Kitap mavjud jetim",
+    cancel_confirm: "Bronni bekor qilishni xalaysizba?",
+    book_deleted: "kitapını o'chirishni xalaysizba?",
+    daily_fee: "Kúnlık narx",
+    due_days: "Múddat (kún)",
+    total_price: "Jami narx",
+    so'm: "sóm",
+    reserve_with_terms: "Bron qiliv",
+    days_label: "kún",
+    price_per_day: "kúnlık",
+    penalty: "Jarıma",
+    penalty_per_day: "Jarıma (her kún úshin)",
+    reservations_title: "Bronlirim",
+    reservations_subtitle: "Sizning kitap bronlaringiz",
+    reservation_not_found: "Bronlar jetim",
+    reservation_not_found_desc: "Siz hali kitap bron qılmadıñız",
+    no_borrowed: "Alınğan kitaplar jetim",
+    no_borrowed_desc: "Siz hali kitap almadıñız",
+    no_returned: "Qaytarılğan kitaplar jetim",
+    no_returned_desc: "Siz hali kitap qaytarmadıñız",
+    waiting_return: "Qaytariv kutilme",
+    qr_code: "QR Kod",
+    qr_scan_hint: "QR kodni kitaphanashıga körseting",
+    book: "Kitap",
+    scan_title: "QR Skaner",
+    scan_subtitle: "QR kodni skanerlang yaki token kiriting",
+    scan_qr: "QR Kodni skanerlang",
+    scan_camera_desc: "QR kod kameranıń arqalı skanerlang",
+    camera_on: "Kamerani yoqiv",
+    camera_off: "Kamerani toxtatıv",
+    camera_error: "Kamera açılmadı",
+    enter_token: "QR Token kiriting",
+    token_placeholder: "Token kiriting yaki QR kodni yozing",
+    book_given_success: "Kitap muvaffaqiyetli berildi!",
+    return_id: "Return ID",
+    return_id_hint: "Kitapnı qaytarishda ushbu ID kerek boladı",
+    new_scan: "Yanğı QR skanerlash",
+    reservation_info: "Bron malumatları",
+    due_info: "Múddat va narx",
+    return_title: "Kitap qaytariv",
+    return_subtitle: "Return ID arqalı kitapnı qaytariv",
+    return_id_placeholder: "Misen: AB0000001",
+    return_btn: "QAYTARILDI",
+    returning: "Qaytarılma",
+    book_returned_success: "Kitap muvaffaqiyetli qaytarıldı!",
+    overdue_books: "Kechikken kitaplar",
+    no_overdue: "Kechikken kitaplar jetim",
+    no_overdue_desc: "Bar kitaplar waqtında qaytarılğan",
+    due_date: "Qaytariv múddati",
+    returned_at: "Qaytarılğan",
+    not_found_or_returned: "Return ID tapılmadı yaki kitap allenqen qaytarılğan",
+    overdue: "Kechikken",
+    send_overdue_notify: "Kechikkenlerge xabar jyllandırv",
+    penalty_amount: "Jarıma miqdorı",
+    days_overdue: "kún kechdi",
+    profile_title: "Profil",
+    profile_subtitle: "Shaxsiy malumatlarıñız",
+    personal_info: "Shaxsiy malumatlar",
+    all_notifications: "Xabarlar",
+    login_label: "Login",
+    admin_dashboard: "Panel",
+    admin_subtitle: "Kitaphana basqaruv paneli",
+    total_books: "Jami kitaplar",
+    available_books: "Mavjud kitaplar",
+    active_reservations: "Bronlar",
+    active_borrowings: "Alınğan kitaplar",
+    total_students: "Oquvshılar",
+    total_teachers: "Oqituvshılar",
+    today_reservations: "Búginiki bronlar",
+    today_borrowed: "Búgin berilgen",
+    today_returned: "Búgin qaytarılğan",
+    overdue_count: "Kechikken",
+    popular_books: "Eng köp oqılğan kitaplar",
+    active_students: "Eng faol oquvshılar",
+    times: "marta",
+    items: "ta",
+    manage_books: "Kitaplar",
+    manage_books_desc: "Kitaplarnı basqarıv",
+    add_book: "Kitap qo'sıv",
+    edit_book: "Kitapnı tahrirlav",
+    book_title_label: "Kitap nomı",
+    delete_book_confirm: "kitapını o'chirishni xalaysizba?",
+    no_books: "Kitaplar jetim",
+    manage_users: "Foydalanuvshılar",
+    manage_users_desc: "Oquvshılar va oqituvshılarnı basqarıv",
+    students_tab: "Oquvshılar",
+    teachers_tab: "Oqituvshılar",
+    add_student: "Oquvshı qo'sıv",
+    add_teacher: "Oqituvshı qo'sıv",
+    active: "Faol",
+    inactive: "Nofaol",
+    no_users: "Foydalanuvshılar jetim",
+    delete_user_confirm: "foydalanuvshısını o'chirishni xalaysizba?",
+    statistics: "Statistika",
+    statistics_desc: "Kitaphana statistikası va hisobatları",
+    today_activity: "Búginiki faoliyet",
+    borrowing_history: "Bar bronlar tarikhı",
+    no_data_yet: "Ma'lumat jetim",
+    no_history: "Hali kitap berilmegen",
+    notif_book_given: "Kitap berildi",
+    notif_book_returned: "Kitap qaytarıldı",
+    notif_overdue: "Múddat ótti",
+    notif_penalty: "Jarıma",
+    notif_book_given_msg: "kitabıñızge muvaffaqiyetli berildi. Return ID:",
+    notif_book_returned_msg: "kitap kitaphanagha muvaffaqiyetli qaytarıldı. Rahmet!",
+    user: "Foydalanuvshı",
+    user_code: "ID",
+    borrowed_at: "Berilgen",
+    due: "Múddat",
     camera: "📷",
     book_icon: "📚",
     check_icon: "✅",
@@ -740,5 +904,6 @@ function langOptions() {
     { code: 'uz', label: "O'zbek", flag: "🇺🇿" },
     { code: 'ru', label: "Русский", flag: "🇷🇺" },
     { code: 'en', label: "English", flag: "🇬🇧" },
+    { code: 'ka', label: "Qaraqalpaq", flag: "🇰🇿" },
   ];
 }

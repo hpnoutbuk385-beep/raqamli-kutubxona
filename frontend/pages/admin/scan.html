@@ -48,7 +48,10 @@
         document.getElementById('successDetails').innerHTML = `<div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
           <div class="qr-info-row"><span class="qr-info-label">📚 ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
           <div class="qr-info-row"><span class="qr-info-label">👤 ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">🆔 ${t('return_id')}:</span><span class="qr-info-value return-id" style="font-size:24px;background:var(--warning-light);padding:8px 16px;border-radius:6px;display:inline-block;margin:8px 0;">${result.return_id}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">📅 ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || 7} ${t('days_label')}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">📅 ${t('due_date')}:</span><span class="qr-info-value">${formatDateTime(result.due_date)}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">💰 ${t('total_price')}:</span><span class="qr-info-value" style="font-size:16px;font-weight:700;color:#2563eb;">${(result.total_price || 0).toLocaleString()} so'm</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">🆔 ${t('return_id')}:</span><span class="qr-info-value return-id" style="font-size:24px;background:#fef3c7;padding:8px 16px;border-radius:6px;display:inline-block;margin:8px 0;">${result.return_id}</span></div>
           <div class="qr-info-row"><span class="qr-info-label">⚠️</span><span class="qr-info-value" style="font-size:13px;color:#d97706;">${t('return_id_hint')}</span></div></div>
           <button class="btn btn-primary mt-4" onclick="resetScanner()">🔄 ${t('new_scan')}</button>`;
       } catch (err) { document.getElementById('resultContent').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }

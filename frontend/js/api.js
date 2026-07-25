@@ -63,8 +63,8 @@ const api = {
 
   reservations: {
     list: () => apiRequest('/reservations'),
-    create: (book_id) =>
-      apiRequest('/reservations', { method: 'POST', body: JSON.stringify({ book_id }) }),
+    create: (book_id, due_days) =>
+      apiRequest('/reservations', { method: 'POST', body: JSON.stringify({ book_id, due_days }) }),
     qr: (id) => apiRequest(`/reservations/${id}/qr`),
     cancel: (id) =>
       apiRequest(`/reservations/${id}/cancel`, { method: 'POST' }),
@@ -78,6 +78,8 @@ const api = {
     returnBook: (return_id) =>
       apiRequest('/borrowing/return', { method: 'POST', body: JSON.stringify({ return_id: return_id.toUpperCase() }) }),
     overdue: () => apiRequest('/borrowing/overdue'),
+    overdueNotify: () =>
+      apiRequest('/borrowing/overdue-notify', { method: 'POST' }),
   },
 
   users: {

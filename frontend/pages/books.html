@@ -76,6 +76,7 @@
                 <span class="book-shelf">📍 ${b.shelf_number || '-'}</span>
                 <span class="book-available" style="color:${b.available_copies > 0 ? '#16a34a' : '#dc2626'}">${b.available_copies}/${b.total_copies}</span>
               </div>
+              <div style="margin-top:4px;font-size:12px;color:#d97706;font-weight:600;">💰 ${(b.daily_fee || 1000).toLocaleString()} so'm/${t('days_label')}</div>
             </div>
           </div>
         `).join('')}</div>`;
@@ -91,6 +92,7 @@
       try {
         const book = await api.books.get(id);
         document.getElementById('modalTitle').textContent = book.title;
+        const dailyFee = book.daily_fee || 1000;
         body.innerHTML = `
           <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;">
             <div style="width:120px;height:160px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:40px;color:white;">📖</div>
@@ -103,20 +105,56 @@
               <p style="color:#6b7280;margin-bottom:4px;">🌐 ${book.language || '-'}</p>
               <p style="color:#6b7280;margin-bottom:4px;">📍 ${t('shelf')}: ${book.shelf_number || '-'}</p>
               <p style="margin-top:8px;">${t('available_copies')}: <strong style="color:${book.available_copies > 0 ? '#16a34a' : '#dc2626'};">${book.available_copies} / ${book.total_copies}</strong></p>
+              <p style="margin-top:4px;color:#d97706;font-weight:600;">💰 ${t('daily_fee')}: ${dailyFee.toLocaleString()} so'm/${t('days_label')}</p>
             </div>
           </div>
-          ${book.description ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;"><strong>${t('description')}:</strong><p style="color:#6b7280;margin-top:4px;">${book.description}</p></div>` : ''}`;
+          ${book.description ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;"><strong>${t('description')}:</strong><p style="color:#6b7280;margin-top:4px;">${book.description}</p></div>` : ''}
+          ${book.available_copies > 0 ? `
+          <div style="margin-top:16px;padding:16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+            <h4 style="margin-bottom:8px;">📅 ${t('due_info')}</h4>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+              <label style="min-width:120px;">${t('due_days')}:</label>
+              <select id="dueDaysSelect" class="form-control" style="width:120px;" onchange="updatePricePreview(${dailyFee})">
+                <option value="3">3 ${t('days_label')}</option>
+                <option value="5">5 ${t('days_label')}</option>
+                <option value="7" selected>7 ${t('days_label')}</option>
+                <option value="10">10 ${t('days_label')}</option>
+                <option value="14">14 ${t('days_label')}</option>
+                <option value="21">21 ${t('days_label')}</option>
+                <option value="30">30 ${t('days_label')}</option>
+              </select>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid #bae6fd;">
+              <span>${t('price_per_day')}:</span><strong>${dailyFee.toLocaleString()} so'm</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid #bae6fd;">
+              <span style="font-size:16px;font-weight:600;">${t('total_price')}:</span>
+              <span id="totalPricePreview" style="font-size:18px;font-weight:700;color:#2563eb;">${(dailyFee * 7).toLocaleString()} so'm</span>
+            </div>
+            <div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:13px;color:#92400e;">
+              ⚠️ ${t('penalty_per_day')}: <strong>${(dailyFee * 2).toLocaleString()} so'm</strong>
+            </div>
+          </div>` : ''}
+        `;
         footer.innerHTML = book.available_copies > 0
-          ? `<button class="btn btn-primary" onclick="reserveBook('${book.id}')">📚 ${t('reserve_btn')}</button>`
+          ? `<button class="btn btn-primary" onclick="reserveBook('${book.id}', ${dailyFee})">📚 ${t('reserve_btn')}</button>`
           : `<button class="btn btn-outline" disabled>${t('book_unavailable')}</button>`;
       } catch (err) { body.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
+    function updatePricePreview(dailyFee) {
+      const days = parseInt(document.getElementById('dueDaysSelect').value) || 7;
+      document.getElementById('totalPricePreview').textContent = (dailyFee * days).toLocaleString() + ' so\'m';
+    }
     function closeBookModal() { document.getElementById('bookModal').style.display = 'none'; }
-    async function reserveBook(bookId) {
+    async function reserveBook(bookId, dailyFee) {
+      const daysEl = document.getElementById('dueDaysSelect');
+      const dueDays = daysEl ? parseInt(daysEl.value) : 7;
+      const totalPrice = dailyFee * dueDays;
+      if (!confirm(`${t('reserve_with_terms')}?\n${t('due_days')}: ${dueDays} ${t('days_label')}\n${t('total_price')}: ${totalPrice.toLocaleString()} so'm`)) return;
       try {
-        const result = await api.reservations.create(bookId);
+        const result = await api.reservations.create(bookId, dueDays);
         closeBookModal();
-        alert(t('book_reserved') + '\n\n' + t('reservation_id') + ': ' + result.reservation_id + '\n\n' + t('qr_hint'));
+        alert(t('book_reserved') + '\n\n' + t('reservation_id') + ': ' + result.reservation_id + '\n' + t('due_days') + ': ' + dueDays + ' ' + t('days_label') + '\n' + t('total_price') + ': ' + totalPrice.toLocaleString() + ' so\'m\n\n' + t('qr_hint'));
         window.location.href = 'reservations.html';
       } catch (err) { alert(err.message); }
     }

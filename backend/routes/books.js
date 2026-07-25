@@ -53,12 +53,13 @@ router.get('/:id', authenticate, async (req, res) => {
 
 router.post('/', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, shelf_number } = req.body;
+    const { isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, shelf_number, daily_fee } = req.body;
     const bookId = 'b-' + uuidv4().slice(0, 8);
     const copies = total_copies || 1;
+    const fee = daily_fee || 1000;
     await db.query(
-      'INSERT INTO books (id, isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, available_copies, shelf_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [bookId, isbn || null, title, author_id || null, category_id || null, publisher || null, published_year || null, language || "O'zbek", description || '', copies, copies, shelf_number || '']);
+      'INSERT INTO books (id, isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, available_copies, shelf_number, daily_fee) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [bookId, isbn || null, title, author_id || null, category_id || null, publisher || null, published_year || null, language || "O'zbek", description || '', copies, copies, shelf_number || '', fee]);
 
     for (let i = 0; i < copies; i++) {
       await db.query('INSERT INTO book_copies (id, book_id, status) VALUES (?, ?, ?)', [`bc-${uuidv4().slice(0, 8)}`, bookId, 'available']);
@@ -73,10 +74,11 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
 
 router.put('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, shelf_number } = req.body;
+    const { isbn, title, author_id, category_id, publisher, published_year, language, description, total_copies, shelf_number, daily_fee } = req.body;
+    const fee = daily_fee || 1000;
     await db.query(
-      'UPDATE books SET isbn=?, title=?, author_id=?, category_id=?, publisher=?, published_year=?, language=?, description=?, total_copies=?, shelf_number=?, updated_at=datetime(\'now\') WHERE id=?',
-      [isbn, title, author_id || null, category_id || null, publisher || null, published_year || null, language, description, total_copies, shelf_number, req.params.id]);
+      `UPDATE books SET isbn=?, title=?, author_id=?, category_id=?, publisher=?, published_year=?, language=?, description=?, total_copies=?, shelf_number=?, daily_fee=?, updated_at=datetime('now') WHERE id=?`,
+      [isbn, title, author_id || null, category_id || null, publisher || null, published_year || null, language, description, total_copies, shelf_number, fee, req.params.id]);
     const result = await db.query('SELECT * FROM books WHERE id = ?', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Kitob topilmadi' });
     res.json(result.rows[0]);

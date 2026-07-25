@@ -33,17 +33,17 @@ function renderSidebar() {
   } else {
     navHTML = `
       <div class="sidebar-section" data-i18n="nav_main">${t('nav_main')}</div>
-      <a class="sidebar-link ${pagePath.includes('dashboard') ? 'active' : ''}" href="${isAdminUser ? '' : '../../'}pages/dashboard.html">
+      <a class="sidebar-link ${pagePath.includes('dashboard') ? 'active' : ''}" href="../../pages/dashboard.html">
         <span class="icon">🏠</span> <span data-i18n="nav_home">${t('nav_home')}</span>
       </a>
-      <a class="sidebar-link ${pagePath.includes('books') && !pagePath.includes('admin') ? 'active' : ''}" href="${isAdminUser ? '' : '../../'}pages/books.html">
+      <a class="sidebar-link ${pagePath.includes('books') && !pagePath.includes('admin') ? 'active' : ''}" href="../../pages/books.html">
         <span class="icon">📚</span> <span data-i18n="nav_books">${t('nav_books')}</span>
       </a>
-      <a class="sidebar-link ${pagePath.includes('reservations') ? 'active' : ''}" href="${isAdminUser ? '' : '../../'}pages/reservations.html">
+      <a class="sidebar-link ${pagePath.includes('reservations') ? 'active' : ''}" href="../../pages/reservations.html">
         <span class="icon">📋</span> <span data-i18n="nav_reservations">${t('nav_reservations')}</span>
       </a>
       <div class="sidebar-section" data-i18n="nav_account">${t('nav_account')}</div>
-      <a class="sidebar-link ${pagePath.includes('profile') ? 'active' : ''}" href="${isAdminUser ? '' : '../../'}pages/profile.html">
+      <a class="sidebar-link ${pagePath.includes('profile') ? 'active' : ''}" href="../../pages/profile.html">
         <span class="icon">👤</span> <span data-i18n="nav_profile">${t('nav_profile')}</span>
       </a>
     `;
@@ -89,6 +89,7 @@ function langOptionsList() {
     { code: 'uz', label: "O'zbek", flag: "🇺🇿" },
     { code: 'ru', label: "Русский", flag: "🇷🇺" },
     { code: 'en', label: "English", flag: "🇬🇧" },
+    { code: 'ka', label: "Qaraqalpaq", flag: "🇰🇿" },
   ];
 }
 
