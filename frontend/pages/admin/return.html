@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitob qaytarish - Admin</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content">
+      <div class="page-header">
+        <h1>🔄 Kitob qaytarish</h1>
+        <p>Return ID orqali kitobni qaytarish</p>
+      </div>
+
+      <div class="card" style="max-width:600px;">
+        <div class="card-header"><h3>📦 Kitob qaytarish</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Return ID</label>
+            <input type="text" class="form-control" id="returnIdInput" placeholder="Masalan: AB0000001" style="font-size:20px;text-align:center;letter-spacing:2px;text-transform:uppercase;" autocomplete="off">
+          </div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="returnBook()" id="returnBtn">🔄 QAYTARILDI</button>
+        </div>
+      </div>
+
+      <div id="resultSection" class="card mt-4" style="display:none;max-width:600px;">
+        <div class="card-body" id="resultContent"></div>
+      </div>
+
+      <div class="card mt-4" style="max-width:800px;">
+        <div class="card-header">
+          <h3>⚠️ Kechikkan kitoblar</h3>
+          <button class="btn btn-sm btn-outline" onclick="loadOverdue()">🔄 Yangilash</button>
+        </div>
+        <div class="card-body" id="overdueTable">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../../js/api.js"></script>
+  <script src="../../../js/auth.js"></script>
+  <script src="../../../js/app.js"></script>
+  <script>
+    if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
+    renderSidebar();
+
+    document.getElementById('returnIdInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') returnBook();
+    });
+
+    async function returnBook() {
+      const returnId = document.getElementById('returnIdInput').value.trim();
+      if (!returnId) {
+        alert('Return ID kiriting');
+        return;
+      }
+
+      const btn = document.getElementById('returnBtn');
+      btn.disabled = true;
+      btn.textContent = 'Qaytarilmoqda...';
+
+      try {
+        const result = await api.borrowing.returnBook(returnId);
+
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultContent').innerHTML = `
+          <div class="success-animation">
+            <div class="check-icon">✅</div>
+            <h2 style="color:var(--success);">Kitob muvaffaqiyatli qaytarildi!</h2>
+            <div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
+              <div class="qr-info-row"><span class="qr-info-label">📚 Kitob:</span><span class="qr-info-value">${result.book_title}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">👤 Foydalanuvchi:</span><span class="qr-info-value">${result.user_name}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">🆔 Return ID:</span><span class="qr-info-value">${result.return_id}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">📅 Qaytarilgan:</span><span class="qr-info-value">${result.returned_at}</span></div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('returnIdInput').value = '';
+        loadOverdue();
+      } catch (err) {
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultContent').innerHTML = `<div class="alert alert-error" style="text-align:center;padding:24px;">
+          <div style="font-size:48px;margin-bottom:12px;">❌</div>
+          <h3>${err.message}</h3>
+        </div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 QAYTARILDI';
+      }
+    }
+
+    async function loadOverdue() {
+      try {
+        const overdue = await api.borrowing.overdue();
+        const container = document.getElementById('overdueTable');
+        if (overdue.length === 0) {
+          showEmpty(container, '✅', 'Kechikkan kitoblar yo\'q', 'Barcha kitoblar vaqtida qaytarilgan');
+          return;
+        }
+        container.innerHTML = `<table><thead><tr><th>Kitob</th><th>Foydalanuvchi</th><th>Sinf</th><th>Telefon</th><th>Qaytarish muddati</th></tr></thead><tbody>
+          ${overdue.map(b => `<tr style="background:#fee2e2;">
+            <td><strong>${b.book_title}</strong></td>
+            <td>${b.user_name}</td>
+            <td>${b.class_name || '-'}</td>
+            <td>${b.phone || '-'}</td>
+            <td><span class="badge badge-overdue">${formatDate(b.due_date)}</span></td>
+          </tr>`).join('')}
+        </tbody></table>`;
+      } catch (err) {
+        document.getElementById('overdueTable').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    }
+
+    loadOverdue();
+  </script>
+</body>
+</html>

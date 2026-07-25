@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistika - Admin</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content">
+      <div class="page-header">
+        <h1>📈 Statistika</h1>
+        <p>Kutubxona statistikasi va hisobotlari</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" style="border-left:4px solid var(--primary);">
+          <div class="stat-value" id="st1">-</div>
+          <div class="stat-label">Jami kitoblar</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid var(--success);">
+          <div class="stat-value" id="st2">-</div>
+          <div class="stat-label">Mavjud nusxalar</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid var(--warning);">
+          <div class="stat-value" id="st3">-</div>
+          <div class="stat-label">Faol bronlar</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid var(--danger);">
+          <div class="stat-value" id="st4">-</div>
+          <div class="stat-label">Olingan kitoblar</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid var(--info);">
+          <div class="stat-value" id="st5">-</div>
+          <div class="stat-label">O'quvchilar</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid #7c3aed;">
+          <div class="stat-value" id="st6">-</div>
+          <div class="stat-label">O'qituvchilar</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-header"><h3>📊 Bugungi faoliyat</h3></div>
+          <div class="card-body">
+            <div id="todayStats"><div class="loading-spinner"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>📈 Eng ko'p o'qilgan kitoblar</h3></div>
+          <div class="card-body" id="popularBooksStats"><div class="loading-spinner"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3>📋 Barcha bronlar tarixi</h3>
+          <button class="btn btn-sm btn-outline" onclick="loadAllBorrowings()">🔄 Yangilash</button>
+        </div>
+        <div class="card-body">
+          <div class="table-container" id="allBorrowings"><div class="loading-spinner"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../../js/api.js"></script>
+  <script src="../../../js/auth.js"></script>
+  <script src="../../../js/app.js"></script>
+  <script>
+    if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
+    renderSidebar();
+
+    async function init() {
+      try {
+        const stats = await api.admin.stats();
+        document.getElementById('st1').textContent = stats.total_books;
+        document.getElementById('st2').textContent = stats.available_books;
+        document.getElementById('st3').textContent = stats.active_reservations;
+        document.getElementById('st4').textContent = stats.active_borrowings;
+        document.getElementById('st5').textContent = stats.total_students;
+        document.getElementById('st6').textContent = stats.total_teachers;
+
+        document.getElementById('todayStats').innerHTML = `
+          <div style="display:grid;gap:12px;">
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:8px;">
+              <span>📋 Bugungi bronlar</span><strong>${stats.today_reservations}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:8px;">
+              <span>📖 Bugun berilgan</span><strong>${stats.today_borrowed}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:8px;">
+              <span>✅ Bugun qaytarilgan</span><strong>${stats.today_returned}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px;background:${stats.overdue_count > 0 ? '#fee2e2' : '#f9fafb'};border-radius:8px;">
+              <span>⚠️ Kechikkan</span><strong style="color:${stats.overdue_count > 0 ? '#dc2626' : '#111827'};">${stats.overdue_count}</strong>
+            </div>
+          </div>
+        `;
+
+        const popular = await api.admin.popularBooks();
+        const popContainer = document.getElementById('popularBooksStats');
+        if (popular.length === 0) {
+          showEmpty(popContainer, '📚', 'Ma\'lumot yo\'q', '');
+        } else {
+          popContainer.innerHTML = popular.map((b, i) => `
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">${i + 1}</div>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:14px;">${b.title}</div>
+                <div style="font-size:12px;color:#6b7280;">${b.author_name || ''}</div>
+              </div>
+              <span class="badge badge-student">${b.borrow_count} marta</span>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      loadAllBorrowings();
+    }
+
+    async function loadAllBorrowings() {
+      try {
+        const borrowings = await api.borrowing.all();
+        const container = document.getElementById('allBorrowings');
+        if (borrowings.length === 0) {
+          showEmpty(container, '📋', 'Hali kitob berilmagan', '');
+          return;
+        }
+        container.innerHTML = `<table><thead><tr><th>Kitob</th><th>Foydalanuvchi</th><th>Turi</th><th>Sinf</th><th>Return ID</th><th>Berilgan</th><th>Muddat</th><th>Holat</th></tr></thead><tbody>
+          ${borrowings.slice(0, 50).map(b => `<tr class="${b.status === 'borrowed' && isOverdue(b.due_date) ? 'overdue-row' : ''}">
+            <td><strong>${b.book_title}</strong></td>
+            <td>${b.user_name}</td>
+            <td>${roleBadge(b.user_type)}</td>
+            <td>${b.class_name || '-'}</td>
+            <td><code style="background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:12px;">${b.return_id}</code></td>
+            <td>${formatDate(b.borrowed_at)}</td>
+            <td>${formatDate(b.due_date)}</td>
+            <td>${b.status === 'returned' ? '<span class="badge badge-returned">Qaytarilgan</span>' : isOverdue(b.due_date) ? '<span class="badge badge-overdue">Kechikkan</span>' : '<span class="badge badge-borrowed">Olingan</span>'}</td>
+          </tr>`).join('')}
+        </tbody></table>`;
+      } catch (err) {
+        document.getElementById('allBorrowings').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    }
+
+    init();
+  </script>
+  <style>
+    .overdue-row { background: #fee2e2 !important; }
+    .overdue-row:hover { background: #fecaca !important; }
+  </style>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kutubxona - Kirish</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="login-page" id="loginPage">
+    <div class="login-container">
+      <div class="login-logo">
+        <div class="logo-icon">📚</div>
+        <h1>Maktab Kutubxonasi</h1>
+        <p>Library Management System</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('login')">Kirish</button>
+        <button class="tab" onclick="showTab('register')">Ro'yxatdan o'tish</button>
+      </div>
+
+      <div id="errorAlert" class="alert alert-error" style="display:none"></div>
+
+      <!-- LOGIN -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" class="form-control" id="loginUsername" placeholder="Loginni kiriting" required>
+        </div>
+        <div class="form-group">
+          <label>Parol</label>
+          <input type="password" class="form-control" id="loginPassword" placeholder="Parolni kiriting" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn">Kirish</button>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
+          Test: admin / admin123
+        </p>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Foydalanuvchi turi</label>
+          <select class="form-control" id="regRole" onchange="toggleRegFields()">
+            <option value="student">O'quvchi</option>
+            <option value="teacher">O'qituvchi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Login</label>
+          <input type="text" class="form-control" id="regUsername" placeholder="Login yarating" required>
+        </div>
+        <div class="form-group">
+          <label>Parol</label>
+          <input type="password" class="form-control" id="regPassword" placeholder="Parol yarating" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ism</label>
+            <input type="text" class="form-control" id="regFirstName" placeholder="Ism" required>
+          </div>
+          <div class="form-group">
+            <label>Familiya</label>
+            <input type="text" class="form-control" id="regLastName" placeholder="Familiya" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="text" class="form-control" id="regPhone" placeholder="+998 XX XXX XX XX">
+        </div>
+        <div id="studentFields">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Sinf</label>
+              <select class="form-control" id="regClassNumber">
+                <option value="1">1-sinf</option><option value="2">2-sinf</option><option value="3">3-sinf</option>
+                <option value="4">4-sinf</option><option value="5">5-sinf</option><option value="6">6-sinf</option>
+                <option value="7">7-sinf</option><option value="8">8-sinf</option>
+                <option value="9" selected>9-sinf</option><option value="10">10-sinf</option><option value="11">11-sinf</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Sinf harfi</label>
+              <select class="form-control" id="regClassLetter">
+                <option value="A">A</option><option value="B" selected>B</option><option value="V">V</option>
+                <option value="G">G</option><option value="E">E</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="teacherFields" style="display:none">
+          <div class="form-group">
+            <label>Fan</label>
+            <input type="text" class="form-control" id="regSubject" placeholder="Fan nomi">
+          </div>
+          <div class="form-group">
+            <label>Lavozim</label>
+            <input type="text" class="form-control" id="regPosition" placeholder="Lavozim">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="regBtn">Ro'yxatdan o'tish</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    if (isLoggedIn()) {
+      const user = getUser();
+      if (user.role === 'admin') window.location.href = 'pages/admin/dashboard.html';
+      else window.location.href = 'pages/dashboard.html';
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+      });
+      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+      hideError();
+    }
+
+    function toggleRegFields() {
+      const role = document.getElementById('regRole').value;
+      document.getElementById('studentFields').style.display = role === 'student' ? 'block' : 'none';
+      document.getElementById('teacherFields').style.display = role === 'teacher' ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorAlert');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('errorAlert').style.display = 'none';
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideError();
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Kirilmoqda...';
+      try {
+        const data = await api.auth.login(
+          document.getElementById('loginUsername').value,
+          document.getElementById('loginPassword').value
+        );
+        saveAuth(data.token, data.user);
+        if (data.user.role === 'admin') window.location.href = 'pages/admin/dashboard.html';
+        else window.location.href = 'pages/dashboard.html';
+      } catch (err) {
+        showError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirish';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      hideError();
+      const btn = document.getElementById('regBtn');
+      btn.disabled = true;
+      btn.textContent = 'Yaratilmoqda...';
+      try {
+        const role = document.getElementById('regRole').value;
+        const profile = {};
+        if (role === 'student') {
+          profile.first_name = document.getElementById('regFirstName').value;
+          profile.last_name = document.getElementById('regLastName').value;
+          profile.phone = document.getElementById('regPhone').value;
+          profile.class_number = parseInt(document.getElementById('regClassNumber').value);
+          profile.class_letter = document.getElementById('regClassLetter').value;
+        } else {
+          profile.first_name = document.getElementById('regFirstName').value;
+          profile.last_name = document.getElementById('regLastName').value;
+          profile.phone = document.getElementById('regPhone').value;
+          profile.subject = document.getElementById('regSubject').value;
+          profile.position = document.getElementById('regPosition').value;
+        }
+
+        const data = await api.auth.register({
+          username: document.getElementById('regUsername').value,
+          password: document.getElementById('regPassword').value,
+          role,
+          profile,
+        });
+        saveAuth(data.token, data.user);
+        window.location.href = 'pages/dashboard.html';
+      } catch (err) {
+        showError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Ro\'yxatdan o\'tish';
+      }
+    }
+  </script>
+</body>
+</html>

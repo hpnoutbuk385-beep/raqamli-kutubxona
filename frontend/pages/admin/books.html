@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitoblar boshqaruvi - Admin</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content">
+      <div class="page-header flex justify-between items-center">
+        <div>
+          <h1>📚 Kitoblar</h1>
+          <p>Kitoblarni boshqarish</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddBook()">+ Kitob qo'shish</button>
+      </div>
+
+      <div class="search-bar">
+        <div class="search-input">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Kitob qidirish..." oninput="debounceSearch()">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-container" id="booksTable">
+          <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <div id="bookModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 id="modalTitle">Kitob</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="bookForm" onsubmit="saveBook(event)">
+              <input type="hidden" id="bookId">
+              <div class="form-group"><label>Kitob nomi *</label><input type="text" class="form-control" id="bookTitle" required></div>
+              <div class="form-row">
+                <div class="form-group"><label>ISBN</label><input type="text" class="form-control" id="bookIsbn"></div>
+                <div class="form-group"><label>Nashr yili</label><input type="number" class="form-control" id="bookYear"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Muallif</label><select class="form-control" id="bookAuthor"><option value="">Tanlang</option></select></div>
+                <div class="form-group"><label>Kategoriya</label><select class="form-control" id="bookCategory"><option value="">Tanlang</option></select></div>
+              </div>
+              <div class="form-group"><label>Nashriyot</label><input type="text" class="form-control" id="bookPublisher"></div>
+              <div class="form-row">
+                <div class="form-group"><label>Jami nusxa</label><input type="number" class="form-control" id="bookCopies" value="1" min="1"></div>
+                <div class="form-group"><label>Javon raqami</label><input type="text" class="form-control" id="bookShelf"></div>
+              </div>
+              <div class="form-group"><label>Tavsif</label><textarea class="form-control" id="bookDesc" rows="3"></textarea></div>
+              <div class="modal-footer" style="padding:0;border:none;margin-top:16px;">
+                <button type="button" class="btn btn-outline" onclick="closeModal()">Bekor</button>
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../../js/api.js"></script>
+  <script src="../../../js/auth.js"></script>
+  <script src="../../../js/app.js"></script>
+  <script>
+    if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
+    renderSidebar();
+
+    let searchTimeout;
+    let authors = [];
+    let categories = [];
+
+    async function init() {
+      try {
+        [authors, categories] = await Promise.all([api.books.authors(), api.books.categories()]);
+        const authSel = document.getElementById('bookAuthor');
+        const catSel = document.getElementById('bookCategory');
+        authors.forEach(a => { const o = document.createElement('option'); o.value = a.id; o.textContent = a.name; authSel.appendChild(o); });
+        categories.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; catSel.appendChild(o); });
+      } catch(e) {}
+      loadBooks();
+    }
+
+    function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(loadBooks, 300); }
+
+    async function loadBooks() {
+      const container = document.getElementById('booksTable');
+      try {
+        const search = document.getElementById('searchInput').value;
+        const books = await api.books.list(search ? { search } : {});
+        if (books.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><h3>Kitoblar yo\'q</h3></div>';
+          return;
+        }
+        container.innerHTML = `<table><thead><tr><th>Kitob</th><th>Muallif</th><th>Kategoriya</th><th>ISBN</th><th>Nusxa</th><th>Javon</th><th>Holat</th><th>Amallar</th></tr></thead><tbody>
+          ${books.map(b => `<tr>
+            <td><strong>${b.title}</strong></td>
+            <td>${b.author_name || '-'}</td>
+            <td>${b.category_name || '-'}</td>
+            <td><code style="font-size:12px;background:#f3f4f6;padding:2px 6px;border-radius:4px;">${b.isbn || '-'}</code></td>
+            <td><span style="color:${b.available_copies > 0 ? '#16a34a' : '#dc2626'};font-weight:600;">${b.available_copies}/${b.total_copies}</span></td>
+            <td>${b.shelf_number || '-'}</td>
+            <td>${b.available_copies > 0 ? '<span class="badge badge-available">Mavjud</span>' : '<span class="badge badge-borrowed">Yo\'q</span>'}</td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="editBook('${b.id}')">✏️</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteBook('${b.id}','${b.title.replace(/'/g, "\\'")}')">🗑️</button>
+            </td>
+          </tr>`).join('')}
+        </tbody></table>`;
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    }
+
+    function openAddBook() {
+      document.getElementById('modalTitle').textContent = 'Kitob qo\'shish';
+      document.getElementById('bookForm').reset();
+      document.getElementById('bookId').value = '';
+      document.getElementById('bookModal').style.display = 'flex';
+    }
+
+    async function editBook(id) {
+      try {
+        const book = await api.books.get(id);
+        document.getElementById('modalTitle').textContent = 'Kitobni tahrirlash';
+        document.getElementById('bookId').value = book.id;
+        document.getElementById('bookTitle').value = book.title;
+        document.getElementById('bookIsbn').value = book.isbn || '';
+        document.getElementById('bookYear').value = book.published_year || '';
+        document.getElementById('bookAuthor').value = book.author_id || '';
+        document.getElementById('bookCategory').value = book.category_id || '';
+        document.getElementById('bookPublisher').value = book.publisher || '';
+        document.getElementById('bookCopies').value = book.total_copies;
+        document.getElementById('bookShelf').value = book.shelf_number || '';
+        document.getElementById('bookDesc').value = book.description || '';
+        document.getElementById('bookModal').style.display = 'flex';
+      } catch (err) { alert(err.message); }
+    }
+
+    async function saveBook(e) {
+      e.preventDefault();
+      const id = document.getElementById('bookId').value;
+      const data = {
+        title: document.getElementById('bookTitle').value,
+        isbn: document.getElementById('bookIsbn').value || null,
+        published_year: parseInt(document.getElementById('bookYear').value) || null,
+        author_id: document.getElementById('bookAuthor').value || null,
+        category_id: document.getElementById('bookCategory').value || null,
+        publisher: document.getElementById('bookPublisher').value || null,
+        total_copies: parseInt(document.getElementById('bookCopies').value) || 1,
+        shelf_number: document.getElementById('bookShelf').value || null,
+        description: document.getElementById('bookDesc').value || null,
+        language: "O'zbek",
+      };
+      try {
+        if (id) await api.books.update(id, data);
+        else await api.books.create(data);
+        closeModal();
+        loadBooks();
+      } catch (err) { alert(err.message); }
+    }
+
+    async function deleteBook(id, title) {
+      if (!confirm(`"${title}" kitobini o'chirishni xohlaysizmi?`)) return;
+      try { await api.books.delete(id); loadBooks(); } catch (err) { alert(err.message); }
+    }
+
+    function closeModal() { document.getElementById('bookModal').style.display = 'none'; }
+
+    init();
+  </script>
+</body>
+</html>

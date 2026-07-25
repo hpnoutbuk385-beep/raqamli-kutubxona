@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bronlarim - Kutubxona</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content">
+      <div class="page-header">
+        <h1>📋 Bronlarim</h1>
+        <p>Sizning kitob bronlaringiz</p>
+      </div>
+
+      <div class="tabs" style="max-width:400px;">
+        <button class="tab active" onclick="filterReservations('reserved', this)">Bron qilingan</button>
+        <button class="tab" onclick="filterReservations('borrowed', this)">Olingan</button>
+        <button class="tab" onclick="filterReservations('returned', this)">Qaytarilgan</button>
+      </div>
+
+      <div id="reservationsContainer">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+
+      <div id="qrModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeQRModal()">
+        <div class="modal">
+          <div class="modal-header">
+            <h2>📱 QR Kod</h2>
+            <button class="modal-close" onclick="closeQRModal()">&times;</button>
+          </div>
+          <div class="modal-body" id="qrModalBody"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/app.js"></script>
+  <script>
+    if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
+    renderSidebar();
+
+    let allReservations = [];
+    let currentFilter = 'reserved';
+
+    async function init() {
+      try {
+        allReservations = await api.reservations.list();
+        renderReservations();
+      } catch (err) {
+        document.getElementById('reservationsContainer').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    }
+
+    function filterReservations(status, el) {
+      currentFilter = status;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderReservations();
+    }
+
+    function renderReservations() {
+      const container = document.getElementById('reservationsContainer');
+      const filtered = allReservations.filter(r => r.status === currentFilter);
+
+      if (filtered.length === 0) {
+        const msgs = {
+          reserved: ['📋', 'Bronlar yo\'q', 'Siz hali kitob bron qilmadingiz'],
+          borrowed: ['📖', 'Olingan kitoblar yo\'q', 'Siz hali kitob olmadingiz'],
+          returned: ['✅', 'Qaytarilgan kitoblar yo\'q', 'Siz hali kitob qaytarmadingiz'],
+        };
+        const [icon, title, msg] = msgs[currentFilter];
+        showEmpty(container, icon, title, msg);
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kitob</th>
+                  <th>Muallif</th>
+                  <th>Reservation ID</th>
+                  <th>Sana</th>
+                  <th>Holat</th>
+                  <th>Amallar</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.map(r => `
+                  <tr>
+                    <td><strong>${r.book_title}</strong></td>
+                    <td>${r.author_name || '-'}</td>
+                    <td><code style="background:#f3f4f6;padding:2px 8px;border-radius:4px;">${r.reservation_id}</code></td>
+                    <td>${formatDate(r.reserved_at)}</td>
+                    <td>${statusBadge(r.status)}</td>
+                    <td>
+                      ${r.status === 'reserved' ? `
+                        <button class="btn btn-sm btn-primary" onclick="showQR('${r.id}')">📱 QR</button>
+                        <button class="btn btn-sm btn-danger" onclick="cancelReservation('${r.id}')">Bekor</button>
+                      ` : ''}
+                      ${r.status === 'borrowed' ? `<span style="font-size:13px;color:#6b7280;">Qaytarish kutilmoqda</span>` : ''}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    async function showQR(id) {
+      const modal = document.getElementById('qrModal');
+      const body = document.getElementById('qrModalBody');
+      body.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+      modal.style.display = 'flex';
+
+      try {
+        const data = await api.reservations.qr(id);
+        const r = data.reservation;
+        body.innerHTML = `
+          <div class="qr-display">
+            <img src="${data.qr}" alt="QR Code">
+            <div class="qr-info">
+              <div class="qr-info-row"><span class="qr-info-label">📚 Kitob:</span><span class="qr-info-value">${r.book_title}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">✍️ Muallif:</span><span class="qr-info-value">${r.author_name || '-'}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">👤 Foydalanuvchi:</span><span class="qr-info-value">${r.user_name}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">🎓 Turi:</span><span class="qr-info-value">${r.user_type === 'student' ? 'O\'quvchi' : 'O\'qituvchi'}</span></div>
+              ${r.class_name ? `<div class="qr-info-row"><span class="qr-info-label">🏫 Sinf:</span><span class="qr-info-value">${r.class_name}</span></div>` : ''}
+              ${r.phone ? `<div class="qr-info-row"><span class="qr-info-label">📞 Telefon:</span><span class="qr-info-value">${r.phone}</span></div>` : ''}
+              <div class="qr-info-row"><span class="qr-info-label">📅 Bron:</span><span class="qr-info-value">${formatDate(r.reserved_at)}</span></div>
+              <div class="qr-info-row"><span class="qr-info-label">🆔 Reservation:</span><span class="qr-info-value">${r.reservation_id}</span></div>
+            </div>
+            <p style="margin-top:12px;font-size:13px;color:#6b7280;">QR kodni kutubxonachiga ko'rsating</p>
+          </div>
+        `;
+      } catch (err) {
+        body.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+      }
+    }
+
+    function closeQRModal() {
+      document.getElementById('qrModal').style.display = 'none';
+    }
+
+    async function cancelReservation(id) {
+      if (!confirm('Bronni bekor qilishni xohlaysizmi?')) return;
+      try {
+        await api.reservations.cancel(id);
+        allReservations = allReservations.map(r => r.id === id ? { ...r, status: 'cancelled' } : r);
+        renderReservations();
+      } catch (err) {
+        alert('Xatolik: ' + err.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Scanner - Admin</title>
+  <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content">
+      <div class="page-header">
+        <h1>📷 QR Scanner</h1>
+        <p>QR kodni skanerlang yoki token kiriting</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="card">
+          <div class="card-header"><h3>📷 QR Kodni skanerlang</h3></div>
+          <div class="card-body">
+            <div class="scanner-area">
+              <div class="scanner-icon">📷</div>
+              <p>QR kod kamerangiz orqali skanerlang</p>
+              <div id="reader" style="width:100%;max-width:400px;margin:0 auto;"></div>
+              <button class="btn btn-primary mt-4" onclick="startScanner()" id="scanBtn">Kamerani yoqish</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>⌨️ QR Token kiriting</h3></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>QR Token / Reservation ID</label>
+              <input type="text" class="form-control" id="tokenInput" placeholder="Token kiriting yoki QR kodni yozing">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="lookupToken()">🔍 Qidirish</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="resultSection" class="card mt-4" style="display:none;">
+        <div class="card-header"><h3>📖 Bron ma'lumotlari</h3></div>
+        <div class="card-body" id="resultContent"></div>
+      </div>
+
+      <div id="successSection" class="card mt-4" style="display:none;">
+        <div class="card-body">
+          <div class="success-animation">
+            <div class="check-icon">✅</div>
+            <h2 id="successTitle">Kitob muvaffaqiyatli berildi!</h2>
+            <div id="successDetails"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="../../../js/api.js"></script>
+  <script src="../../../js/auth.js"></script>
+  <script src="../../../js/app.js"></script>
+  <script>
+    if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
+    renderSidebar();
+
+    let html5QrCode = null;
+
+    function startScanner() {
+      const btn = document.getElementById('scanBtn');
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+          btn.textContent = 'Kamerani yoqish';
+        });
+        return;
+      }
+
+      html5QrCode = new Html5Qrcode('reader');
+      html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+          document.getElementById('tokenInput').value = decodedText;
+          html5QrCode.stop();
+          btn.textContent = 'Kamerani yoqish';
+          lookupToken();
+        },
+        () => {}
+      ).then(() => {
+        btn.textContent = 'Kamerani to\'xtatish';
+      }).catch(err => {
+        alert('Kamera ochilmadi: ' + err);
+      });
+    }
+
+    async function lookupToken() {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) {
+        alert('Token kiriting');
+        return;
+      }
+
+      document.getElementById('resultSection').style.display = 'block';
+      document.getElementById('successSection').style.display = 'none';
+      document.getElementById('resultContent').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+      try {
+        const result = await api.borrowing.confirm(token);
+        document.getElementById('resultSection').style.display = 'none';
+        document.getElementById('successSection').style.display = 'block';
+
+        document.getElementById('successTitle').textContent = '📚 Kitob muvaffaqiyatli berildi!';
+        document.getElementById('successDetails').innerHTML = `
+          <div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
+            <div class="qr-info-row"><span class="qr-info-label">📚 Kitob:</span><span class="qr-info-value">${result.book_title}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">👤 Foydalanuvchi:</span><span class="qr-info-value">${result.user_name}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">🆔 Return ID:</span><span class="qr-info-value return-id" style="font-size:24px;background:var(--warning-light);padding:8px 16px;border-radius:6px;display:inline-block;margin:8px 0;">${result.return_id}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">⚠️</span><span class="qr-info-value" style="font-size:13px;color:#d97706;">Kitobni qaytarishda ushbu ID kerak bo'ladi</span></div>
+          </div>
+          <button class="btn btn-primary mt-4" onclick="resetScanner()">Yangi QR skanerlash</button>
+        `;
+      } catch (err) {
+        document.getElementById('resultContent').innerHTML = `
+          <div class="alert alert-error">${err.message}</div>
+          <div style="text-align:center;padding:20px;">
+            <p style="color:#6b7280;">Qaytadan urinib ko'ring</p>
+          </div>
+        `;
+      }
+    }
+
+    function resetScanner() {
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('successSection').style.display = 'none';
+      document.getElementById('tokenInput').value = '';
+    }
+  </script>
+</body>
+</html>
