@@ -22,17 +22,17 @@ router.get('/unread-count', authenticate, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server xatosi' }); }
 });
 
-router.put('/:id/read', authenticate, async (req, res) => {
-  try {
-    await db.query('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
-    res.json({ message: "O'qilgan deb belgilandi" });
-  } catch (err) { res.status(500).json({ error: 'Server xatosi' }); }
-});
-
 router.put('/read-all', authenticate, async (req, res) => {
   try {
     await db.query('UPDATE notifications SET is_read = 1 WHERE user_id = ?', [req.user.id]);
     res.json({ message: "Barcha xabarlar o'qilgan deb belgilandi" });
+  } catch (err) { res.status(500).json({ error: 'Server xatosi' }); }
+});
+
+router.put('/:id/read', authenticate, async (req, res) => {
+  try {
+    await db.query('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+    res.json({ message: "O'qilgan deb belgilandi" });
   } catch (err) { res.status(500).json({ error: 'Server xatosi' }); }
 });
 

@@ -503,8 +503,7 @@ tr:hover { background: var(--gray-50); }
   font-weight: 600;
 }
 
-.book-available.> 0 { color: var(--success); }
-.book-available.0 { color: var(--danger); }
+
 
 .modal-overlay {
   position: fixed;
