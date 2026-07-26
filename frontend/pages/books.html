@@ -12,12 +12,12 @@
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-header">
-        <h1 data-i18n="books_title">рџ“љ Kitoblar</h1>
+        <h1 data-i18n="books_title">СЂСџвЂњС™ Kitoblar</h1>
         <p data-i18n="books_subtitle">Kutubxonadagi barcha kitoblar</p>
       </div>
       <div class="search-bar">
         <div class="search-input">
-          <span class="search-icon">рџ”Ќ</span>
+          <span class="search-icon">СЂСџвЂќРЊ</span>
           <input type="text" id="searchInput" data-i18n-placeholder="book_search" placeholder="Kitob qidirish..." oninput="debounceSearch()">
         </div>
         <select class="form-control" id="categoryFilter" onchange="loadBooks()" style="max-width:200px;">
@@ -34,10 +34,10 @@
       </div>
     </main>
   </div>
-  <script src="../../js/i18n.js?v=1785013902"></script>
-  <script src="../../js/api.js?v=1785013902"></script>
-  <script src="../../js/auth.js?v=1785013902"></script>
-  <script src="../../js/app.js?v=1785013902"></script>
+  <script src="../../js/i18n.js?v=1785079262"></script>
+  <script src="../../js/api.js?v=1785079262"></script>
+  <script src="../../js/auth.js?v=1785079262"></script>
+  <script src="../../js/app.js?v=1785079262"></script>
   <script>
     if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -62,21 +62,21 @@
         if (search) params.search = search;
         if (cat) params.category = cat;
         const books = await api.books.list(params);
-        if (books.length === 0) { showEmpty(container, 'рџ“љ', t('book_not_found'), t('book_not_found_desc')); return; }
+        if (books.length === 0) { showEmpty(container, 'СЂСџвЂњС™', t('book_not_found'), t('book_not_found_desc')); return; }
         container.innerHTML = `<div class="book-grid">${books.map((b, i) => `
           <div class="book-card" onclick="showBook('${b.id}')">
             <div class="book-cover" style="background:${getBookColor(i)}">
-              <span>рџ“–</span>
+              <span>СЂСџвЂњвЂ“</span>
               ${b.available_copies > 0 ? `<span class="badge badge-available" style="position:absolute;top:8px;right:8px;">${t('available')}</span>` : `<span class="badge badge-borrowed" style="position:absolute;top:8px;right:8px;">${t('unavailable')}</span>`}
             </div>
             <div class="book-info">
               <div class="book-title">${b.title}</div>
               <div class="book-author">${b.author_name || '-'}</div>
               <div class="book-meta">
-                <span class="book-shelf">рџ“Ќ ${b.shelf_number || '-'}</span>
+                <span class="book-shelf">СЂСџвЂњРЊ ${b.shelf_number || '-'}</span>
                 <span class="book-available" style="color:${b.available_copies > 0 ? '#16a34a' : '#dc2626'}">${b.available_copies}/${b.total_copies}</span>
               </div>
-              <div style="margin-top:4px;font-size:12px;color:#d97706;font-weight:600;">рџ’° ${(b.daily_fee || 1000).toLocaleString()} so'm/${t('days_label')}</div>
+              <div style="margin-top:4px;font-size:12px;color:#d97706;font-weight:600;">СЂСџвЂ™В° ${(b.daily_fee || 1000).toLocaleString()} so'm/${t('days_label')}</div>
             </div>
           </div>
         `).join('')}</div>`;
@@ -95,23 +95,23 @@
         const dailyFee = book.daily_fee || 1000;
         body.innerHTML = `
           <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;">
-            <div style="width:120px;height:160px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:40px;color:white;">рџ“–</div>
+            <div style="width:120px;height:160px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:40px;color:white;">СЂСџвЂњвЂ“</div>
             <div>
               <h3 style="font-size:18px;margin-bottom:8px;">${book.title}</h3>
-              <p style="color:#6b7280;margin-bottom:4px;">вњЌпёЏ ${book.author_name || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">рџ“Ѓ ${book.category_name || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">рџ“„ ${book.publisher || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">рџ“… ${book.published_year || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">рџЊђ ${book.language || '-'}</p>
-              <p style="color:#6b7280;margin-bottom:4px;">рџ“Ќ ${t('shelf')}: ${book.shelf_number || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">РІСљРЊРїС‘РЏ ${book.author_name || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">СЂСџвЂњРѓ ${book.category_name || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">СЂСџвЂњвЂћ ${book.publisher || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">СЂСџвЂњвЂ¦ ${book.published_year || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">СЂСџРЉС’ ${book.language || '-'}</p>
+              <p style="color:#6b7280;margin-bottom:4px;">СЂСџвЂњРЊ ${t('shelf')}: ${book.shelf_number || '-'}</p>
               <p style="margin-top:8px;">${t('available_copies')}: <strong style="color:${book.available_copies > 0 ? '#16a34a' : '#dc2626'};">${book.available_copies} / ${book.total_copies}</strong></p>
-              <p style="margin-top:4px;color:#d97706;font-weight:600;">рџ’° ${t('daily_fee')}: ${dailyFee.toLocaleString()} so'm/${t('days_label')}</p>
+              <p style="margin-top:4px;color:#d97706;font-weight:600;">СЂСџвЂ™В° ${t('daily_fee')}: ${dailyFee.toLocaleString()} so'm/${t('days_label')}</p>
             </div>
           </div>
           ${book.description ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;"><strong>${t('description')}:</strong><p style="color:#6b7280;margin-top:4px;">${book.description}</p></div>` : ''}
           ${book.available_copies > 0 ? `
           <div style="margin-top:16px;padding:16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
-            <h4 style="margin-bottom:8px;">рџ“… ${t('due_info')}</h4>
+            <h4 style="margin-bottom:8px;">СЂСџвЂњвЂ¦ ${t('due_info')}</h4>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
               <label style="min-width:120px;">${t('due_days')}:</label>
               <select id="dueDaysSelect" class="form-control" style="width:120px;" onchange="updatePricePreview(${dailyFee})">
@@ -132,12 +132,12 @@
               <span id="totalPricePreview" style="font-size:18px;font-weight:700;color:#2563eb;">${(dailyFee * 7).toLocaleString()} so'm</span>
             </div>
             <div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:13px;color:#92400e;">
-              вљ пёЏ ${t('penalty_per_day')}: <strong>${(dailyFee * 2).toLocaleString()} so'm</strong>
+              РІС™В РїС‘РЏ ${t('penalty_per_day')}: <strong>${(dailyFee * 2).toLocaleString()} so'm</strong>
             </div>
           </div>` : ''}
         `;
         footer.innerHTML = book.available_copies > 0
-          ? `<button class="btn btn-primary" onclick="reserveBook('${book.id}', ${dailyFee})">рџ“љ ${t('reserve_btn')}</button>`
+          ? `<button class="btn btn-primary" onclick="reserveBook('${book.id}', ${dailyFee})">СЂСџвЂњС™ ${t('reserve_btn')}</button>`
           : `<button class="btn btn-outline" disabled>${t('book_unavailable')}</button>`;
       } catch (err) { body.innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }

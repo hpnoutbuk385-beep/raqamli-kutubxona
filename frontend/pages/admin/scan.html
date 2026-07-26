@@ -10,22 +10,22 @@
   <div class="app-layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
-      <div class="page-header"><h1>рџ“· <span data-i18n="scan_title">QR Scanner</span></h1><p data-i18n="scan_subtitle">QR kodni skanerlang yoki token kiriting</p></div>
+      <div class="page-header"><h1>СЂСџвЂњВ· <span data-i18n="scan_title">QR Scanner</span></h1><p data-i18n="scan_subtitle">QR kodni skanerlang yoki token kiriting</p></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <div class="card"><div class="card-header"><h3>рџ“· <span data-i18n="scan_qr">QR Kodni skanerlang</span></h3></div>
-          <div class="card-body"><div class="scanner-area"><div class="scanner-icon">рџ“·</div><p data-i18n="scan_camera_desc">QR kod kamerangiz orqali skanerlang</p><div id="reader" style="width:100%;max-width:400px;margin:0 auto;"></div><button class="btn btn-primary mt-4" onclick="startScanner()" id="scanBtn" data-i18n="camera_on">Kamerani yoqish</button></div></div></div>
-        <div class="card"><div class="card-header"><h3>вЊЁпёЏ <span data-i18n="enter_token">QR Token kiriting</span></h3></div>
-          <div class="card-body"><div class="form-group"><label data-i18n="enter_token">QR Token / Reservation ID</label><input type="text" class="form-control" id="tokenInput" data-i18n-placeholder="token_placeholder" placeholder="Token kiriting yoki QR kodni yozing"></div><button class="btn btn-primary btn-full" onclick="lookupToken()">рџ”Ќ <span data-i18n="search">Qidirish</span></button></div></div>
+        <div class="card"><div class="card-header"><h3>СЂСџвЂњВ· <span data-i18n="scan_qr">QR Kodni skanerlang</span></h3></div>
+          <div class="card-body"><div class="scanner-area"><div class="scanner-icon">СЂСџвЂњВ·</div><p data-i18n="scan_camera_desc">QR kod kamerangiz orqali skanerlang</p><div id="reader" style="width:100%;max-width:400px;margin:0 auto;"></div><button class="btn btn-primary mt-4" onclick="startScanner()" id="scanBtn" data-i18n="camera_on">Kamerani yoqish</button></div></div></div>
+        <div class="card"><div class="card-header"><h3>РІРЉРЃРїС‘РЏ <span data-i18n="enter_token">QR Token kiriting</span></h3></div>
+          <div class="card-body"><div class="form-group"><label data-i18n="enter_token">QR Token / Reservation ID</label><input type="text" class="form-control" id="tokenInput" data-i18n-placeholder="token_placeholder" placeholder="Token kiriting yoki QR kodni yozing"></div><button class="btn btn-primary btn-full" onclick="lookupToken()">СЂСџвЂќРЊ <span data-i18n="search">Qidirish</span></button></div></div>
       </div>
-      <div id="resultSection" class="card mt-4" style="display:none;"><div class="card-header"><h3>рџ“– <span data-i18n="reservation_info">Bron ma'lumotlari</span></h3></div><div class="card-body" id="resultContent"></div></div>
-      <div id="successSection" class="card mt-4" style="display:none;"><div class="card-body"><div class="success-animation"><div class="check-icon">вњ…</div><h2 id="successTitle">Kitob muvaffaqiyatli berildi!</h2><div id="successDetails"></div></div></div></div>
+      <div id="resultSection" class="card mt-4" style="display:none;"><div class="card-header"><h3>СЂСџвЂњвЂ“ <span data-i18n="reservation_info">Bron ma'lumotlari</span></h3></div><div class="card-body" id="resultContent"></div></div>
+      <div id="successSection" class="card mt-4" style="display:none;"><div class="card-body"><div class="success-animation"><div class="check-icon">РІСљвЂ¦</div><h2 id="successTitle">Kitob muvaffaqiyatli berildi!</h2><div id="successDetails"></div></div></div></div>
     </main>
   </div>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="../../../js/i18n.js?v=1785013902"></script>
-  <script src="../../../js/api.js?v=1785013902"></script>
-  <script src="../../../js/auth.js?v=1785013902"></script>
-  <script src="../../../js/app.js?v=1785013902"></script>
+  <script src="../../../js/i18n.js?v=1785079262"></script>
+  <script src="../../../js/api.js?v=1785079262"></script>
+  <script src="../../../js/auth.js?v=1785079262"></script>
+  <script src="../../../js/app.js?v=1785079262"></script>
   <script>
     if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -46,14 +46,14 @@
         document.getElementById('resultSection').style.display = 'none'; document.getElementById('successSection').style.display = 'block';
         document.getElementById('successTitle').textContent = t('book_given_success');
         document.getElementById('successDetails').innerHTML = `<div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
-          <div class="qr-info-row"><span class="qr-info-label">рџ“љ ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">рџ‘¤ ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">рџ“… ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || 7} ${t('days_label')}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">рџ“… ${t('due_date')}:</span><span class="qr-info-value">${formatDateTime(result.due_date)}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">рџ’° ${t('total_price')}:</span><span class="qr-info-value" style="font-size:16px;font-weight:700;color:#2563eb;">${(result.total_price || 0).toLocaleString()} so'm</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">рџ†” ${t('return_id')}:</span><span class="qr-info-value return-id" style="font-size:24px;background:#fef3c7;padding:8px 16px;border-radius:6px;display:inline-block;margin:8px 0;">${result.return_id}</span></div>
-          <div class="qr-info-row"><span class="qr-info-label">вљ пёЏ</span><span class="qr-info-value" style="font-size:13px;color:#d97706;">${t('return_id_hint')}</span></div></div>
-          <button class="btn btn-primary mt-4" onclick="resetScanner()">рџ”„ ${t('new_scan')}</button>`;
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњС™ ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂВ¤ ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњвЂ¦ ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || 7} ${t('days_label')}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњвЂ¦ ${t('due_date')}:</span><span class="qr-info-value">${formatDateTime(result.due_date)}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂ™В° ${t('total_price')}:</span><span class="qr-info-value" style="font-size:16px;font-weight:700;color:#2563eb;">${(result.total_price || 0).toLocaleString()} so'm</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂ вЂќ ${t('return_id')}:</span><span class="qr-info-value return-id" style="font-size:24px;background:#fef3c7;padding:8px 16px;border-radius:6px;display:inline-block;margin:8px 0;">${result.return_id}</span></div>
+          <div class="qr-info-row"><span class="qr-info-label">РІС™В РїС‘РЏ</span><span class="qr-info-value" style="font-size:13px;color:#d97706;">${t('return_id_hint')}</span></div></div>
+          <button class="btn btn-primary mt-4" onclick="resetScanner()">СЂСџвЂќвЂћ ${t('new_scan')}</button>`;
       } catch (err) { document.getElementById('resultContent').innerHTML = `<div class="alert alert-error">${err.message}</div>`; }
     }
     function resetScanner() { document.getElementById('resultSection').style.display = 'none'; document.getElementById('successSection').style.display = 'none'; document.getElementById('tokenInput').value = ''; }

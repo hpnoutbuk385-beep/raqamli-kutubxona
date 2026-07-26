@@ -51,7 +51,6 @@ function renderSidebar() {
 
   const initials = getUserInitials(user);
   const roleKey = user.role === 'student' ? 'student' : user.role === 'teacher' ? 'teacher' : 'admin';
-  const langOptions = langOptionsList();
 
   document.getElementById('sidebar').innerHTML = `
     <div class="sidebar-header">
@@ -63,7 +62,7 @@ function renderSidebar() {
       ${navHTML}
     </nav>
     <div class="sidebar-lang">
-      ${langOptions.map(l => `
+      ${langOptions().map(l => `
         <button class="lang-btn ${l.code === getLang() ? 'active' : ''}" onclick="switchLang('${l.code}')">
           ${l.flag} ${l.label}
         </button>
@@ -84,30 +83,8 @@ function renderSidebar() {
   `;
 }
 
-function langOptionsList() {
-  return [
-    { code: 'uz', label: "O'zbek", flag: "🇺🇿" },
-    { code: 'ru', label: "Русский", flag: "🇷🇺" },
-    { code: 'en', label: "English", flag: "🇬🇧" },
-    { code: 'ka', label: "Qaraqalpaq", flag: "🇰🇿" },
-  ];
-}
-
 function switchLang(lang) {
   setLanguage(lang);
   renderSidebar();
   if (typeof refreshPage === 'function') refreshPage();
-}
-
-function applyLangToElements() {
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const val = t(key);
-    if (val) el.textContent = val;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    const val = t(key);
-    if (val) el.placeholder = val;
-  });
 }

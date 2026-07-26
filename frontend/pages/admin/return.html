@@ -10,30 +10,30 @@
   <div class="app-layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
-      <div class="page-header"><h1>рџ”„ <span data-i18n="return_title">Kitob qaytarish</span></h1><p data-i18n="return_subtitle">Return ID orqali kitobni qaytarish</p></div>
+      <div class="page-header"><h1>СЂСџвЂќвЂћ <span data-i18n="return_title">Kitob qaytarish</span></h1><p data-i18n="return_subtitle">Return ID orqali kitobni qaytarish</p></div>
       <div class="card" style="max-width:600px;">
-        <div class="card-header"><h3>рџ“¦ <span data-i18n="return_title">Kitob qaytarish</span></h3></div>
+        <div class="card-header"><h3>СЂСџвЂњВ¦ <span data-i18n="return_title">Kitob qaytarish</span></h3></div>
         <div class="card-body">
           <div class="form-group"><label>Return ID</label><input type="text" class="form-control" id="returnIdInput" data-i18n-placeholder="return_id_placeholder" placeholder="Masalan: AB0000001" style="font-size:20px;text-align:center;letter-spacing:2px;text-transform:uppercase;" autocomplete="off"></div>
-          <button class="btn btn-primary btn-full btn-lg" onclick="returnBook()" id="returnBtn" data-i18n="return_btn">рџ”„ QAYTARILDI</button>
+          <button class="btn btn-primary btn-full btn-lg" onclick="returnBook()" id="returnBtn" data-i18n="return_btn">СЂСџвЂќвЂћ QAYTARILDI</button>
         </div>
       </div>
       <div id="resultSection" class="card mt-4" style="display:none;max-width:600px;"><div class="card-body" id="resultContent"></div></div>
       <div class="card mt-4" style="max-width:800px;">
-        <div class="card-header"><h3>вљ пёЏ <span data-i18n="overdue_books">Kechikkan kitoblar</span></h3>
+        <div class="card-header"><h3>РІС™В РїС‘РЏ <span data-i18n="overdue_books">Kechikkan kitoblar</span></h3>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-sm btn-danger" onclick="sendOverdueNotify()">рџ“ў <span data-i18n="send_overdue_notify">Xabar yuborish</span></button>
-            <button class="btn btn-sm btn-outline" onclick="loadOverdue()" data-i18n="refresh">рџ”„ Yangilash</button>
+            <button class="btn btn-sm btn-danger" onclick="sendOverdueNotify()">СЂСџвЂњСћ <span data-i18n="send_overdue_notify">Xabar yuborish</span></button>
+            <button class="btn btn-sm btn-outline" onclick="loadOverdue()" data-i18n="refresh">СЂСџвЂќвЂћ Yangilash</button>
           </div>
         </div>
         <div class="card-body" id="overdueTable"><div class="loading-spinner"><div class="spinner"></div></div></div>
       </div>
     </main>
   </div>
-  <script src="../../../js/i18n.js?v=1785013902"></script>
-  <script src="../../../js/api.js?v=1785013902"></script>
-  <script src="../../../js/auth.js?v=1785013902"></script>
-  <script src="../../../js/app.js?v=1785013902"></script>
+  <script src="../../../js/i18n.js?v=1785079262"></script>
+  <script src="../../../js/api.js?v=1785079262"></script>
+  <script src="../../../js/auth.js?v=1785079262"></script>
+  <script src="../../../js/app.js?v=1785079262"></script>
   <script>
     if (!isLoggedIn() || !isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -46,24 +46,24 @@
         const result = await api.borrowing.returnBook(returnId);
         document.getElementById('resultSection').style.display = 'block';
         const penaltyHtml = result.penalty > 0
-          ? `<div class="qr-info-row" style="background:#fee2e2;padding:8px;border-radius:6px;margin-top:8px;"><span class="qr-info-label">вљ пёЏ ${t('penalty')}:</span><span class="qr-info-value" style="font-size:18px;font-weight:700;color:#dc2626;">${result.penalty.toLocaleString()} so'm</span></div>`
+          ? `<div class="qr-info-row" style="background:#fee2e2;padding:8px;border-radius:6px;margin-top:8px;"><span class="qr-info-label">РІС™В РїС‘РЏ ${t('penalty')}:</span><span class="qr-info-value" style="font-size:18px;font-weight:700;color:#dc2626;">${result.penalty.toLocaleString()} so'm</span></div>`
           : '';
-        document.getElementById('resultContent').innerHTML = `<div class="success-animation"><div class="check-icon">вњ…</div><h2 style="color:var(--success);">${t('book_returned_success')}</h2>
+        document.getElementById('resultContent').innerHTML = `<div class="success-animation"><div class="check-icon">РІСљвЂ¦</div><h2 style="color:var(--success);">${t('book_returned_success')}</h2>
           <div style="text-align:left;max-width:400px;margin:16px auto;background:#f9fafb;padding:16px;border-radius:8px;">
-            <div class="qr-info-row"><span class="qr-info-label">рџ“љ ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">рџ‘¤ ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">рџ†” ${t('return_id')}:</span><span class="qr-info-value">${result.return_id}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">рџ“… ${t('returned_at')}:</span><span class="qr-info-value">${result.returned_at}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">рџ“… ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || '-'} ${t('days_label')}</span></div>
-            <div class="qr-info-row"><span class="qr-info-label">рџ’° ${t('total_price')}:</span><span class="qr-info-value">${(result.total_price || 0).toLocaleString()} so'm</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњС™ ${t('book')}:</span><span class="qr-info-value">${result.book_title}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂВ¤ ${t('user')}:</span><span class="qr-info-value">${result.user_name}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂ вЂќ ${t('return_id')}:</span><span class="qr-info-value">${result.return_id}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњвЂ¦ ${t('returned_at')}:</span><span class="qr-info-value">${result.returned_at}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂњвЂ¦ ${t('due_days')}:</span><span class="qr-info-value">${result.due_days || '-'} ${t('days_label')}</span></div>
+            <div class="qr-info-row"><span class="qr-info-label">СЂСџвЂ™В° ${t('total_price')}:</span><span class="qr-info-value">${(result.total_price || 0).toLocaleString()} so'm</span></div>
             ${penaltyHtml}</div></div>`;
         document.getElementById('returnIdInput').value = ''; loadOverdue();
-      } catch (err) { document.getElementById('resultSection').style.display = 'block'; document.getElementById('resultContent').innerHTML = `<div class="alert alert-error" style="text-align:center;padding:24px;"><div style="font-size:48px;margin-bottom:12px;">вќЊ</div><h3>${err.message}</h3></div>`; }
-      finally { btn.disabled = false; btn.textContent = 'рџ”„ ' + t('return_btn'); }
+      } catch (err) { document.getElementById('resultSection').style.display = 'block'; document.getElementById('resultContent').innerHTML = `<div class="alert alert-error" style="text-align:center;padding:24px;"><div style="font-size:48px;margin-bottom:12px;">РІСњРЉ</div><h3>${err.message}</h3></div>`; }
+      finally { btn.disabled = false; btn.textContent = 'СЂСџвЂќвЂћ ' + t('return_btn'); }
     }
     async function loadOverdue() {
       try { const overdue = await api.borrowing.overdue(); const c = document.getElementById('overdueTable');
-        if (overdue.length === 0) { showEmpty(c, 'вњ…', t('no_overdue'), t('no_overdue_desc')); return; }
+        if (overdue.length === 0) { showEmpty(c, 'РІСљвЂ¦', t('no_overdue'), t('no_overdue_desc')); return; }
         c.innerHTML = `<table><thead><tr><th>${t('book')}</th><th>${t('user')}</th><th>${t('class')}</th><th>${t('phone')}</th><th>${t('due_date')}</th><th>${t('penalty')}</th></tr></thead><tbody>
           ${overdue.map(b => {
             const overdueDays = Math.ceil((new Date() - new Date(b.due_date)) / (1000 * 60 * 60 * 24));
@@ -75,7 +75,7 @@
     async function sendOverdueNotify() {
       try {
         const result = await api.borrowing.overdueNotify();
-        alert(`вњ… ${result.message}`);
+        alert(`РІСљвЂ¦ ${result.message}`);
       } catch (err) { alert(err.message); }
     }
     loadOverdue();

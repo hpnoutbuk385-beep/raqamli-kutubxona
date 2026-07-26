@@ -12,7 +12,7 @@
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-header">
-        <h1 data-i18n="profile_title">рџ‘¤ Profil</h1>
+        <h1 data-i18n="profile_title">СЂСџвЂВ¤ Profil</h1>
         <p data-i18n="profile_subtitle">Shaxsiy ma'lumotlaringiz</p>
       </div>
 
@@ -28,16 +28,16 @@
           <div class="card-body" id="profileInfo"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>рџ”” <span data-i18n="all_notifications">Bildirishnomalar</span></h3></div>
+          <div class="card-header"><h3>СЂСџвЂќвЂќ <span data-i18n="all_notifications">Bildirishnomalar</span></h3></div>
           <div class="card-body" id="notificationsList" style="max-height:500px;overflow-y:auto;"><div class="loading-spinner"><div class="spinner"></div></div></div>
         </div>
       </div>
     </main>
   </div>
-  <script src="../../js/i18n.js?v=1785013902"></script>
-  <script src="../../js/api.js?v=1785013902"></script>
-  <script src="../../js/auth.js?v=1785013902"></script>
-  <script src="../../js/app.js?v=1785013902"></script>
+  <script src="../../js/i18n.js?v=1785079262"></script>
+  <script src="../../js/api.js?v=1785079262"></script>
+  <script src="../../js/auth.js?v=1785079262"></script>
+  <script src="../../js/app.js?v=1785079262"></script>
   <script>
     if (!isLoggedIn() || isAdmin()) window.location.href = '../../';
     renderSidebar(); applyLangToElements();
@@ -70,10 +70,10 @@
               <div style="flex:1;text-align:left;">
                 <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">${fullName}</h2>
                 <span class="badge ${badgeClass}" style="font-size:13px;padding:5px 14px;">${roleLabel}</span>
-                ${p && p.student_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">рџЋ“ ${t('student')} ID: <strong style="color:#111827;">${p.student_id}</strong></div>` : ''}
-                ${p && p.teacher_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">рџЋ“ ${t('teacher')} ID: <strong style="color:#111827;">${p.teacher_id}</strong></div>` : ''}
-                ${p && p.class_number ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">рџЏ« ${t('class')}: <strong style="color:#111827;">${p.class_number}-${p.class_letter}</strong></div>` : ''}
-                ${p && p.subject ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">рџ“– ${t('subject')}: <strong style="color:#111827;">${p.subject}</strong></div>` : ''}
+                ${p && p.student_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">СЂСџР‹вЂњ ${t('student')} ID: <strong style="color:#111827;">${p.student_id}</strong></div>` : ''}
+                ${p && p.teacher_id ? `<div style="margin-top:8px;font-size:14px;color:#6b7280;">СЂСџР‹вЂњ ${t('teacher')} ID: <strong style="color:#111827;">${p.teacher_id}</strong></div>` : ''}
+                ${p && p.class_number ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">СЂСџРЏВ« ${t('class')}: <strong style="color:#111827;">${p.class_number}-${p.class_letter}</strong></div>` : ''}
+                ${p && p.subject ? `<div style="margin-top:4px;font-size:14px;color:#6b7280;">СЂСџвЂњвЂ“ ${t('subject')}: <strong style="color:#111827;">${p.subject}</strong></div>` : ''}
               </div>
             </div>
           </div>
@@ -83,15 +83,15 @@
         if (p) {
           const row = (icon, label, val) => val ? `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f3f4f6;"><span style="font-size:18px;width:28px;text-align:center;">${icon}</span><span style="color:#6b7280;min-width:140px;">${label}</span><strong style="flex:1;">${val}</strong></div>` : '';
           infoContainer.innerHTML = `<div style="display:grid;gap:0;">
-            ${row('рџ‘¤', t('first_name'), p.first_name)}
-            ${row('рџ‘¤', t('last_name'), p.last_name)}
-            ${p.father_name ? row('рџ‘Ё', t('father_name'), p.father_name) : ''}
-            ${row('рџ“ћ', t('phone'), p.phone || '-')}
-            ${user.role === 'student' && p.class_number ? row('рџЏ«', t('class'), p.class_number + '-' + p.class_letter) : ''}
-            ${p.subject ? row('рџ“–', t('subject'), p.subject) : ''}
-            ${p.position ? row('рџ’ј', t('position'), p.position) : ''}
-            ${row('рџ”‘', t('login_label'), user.username)}
-            ${row('рџ“§', 'Email', user.email || '-')}
+            ${row('СЂСџвЂВ¤', t('first_name'), p.first_name)}
+            ${row('СЂСџвЂВ¤', t('last_name'), p.last_name)}
+            ${p.father_name ? row('СЂСџвЂРЃ', t('father_name'), p.father_name) : ''}
+            ${row('СЂСџвЂњС›', t('phone'), p.phone || '-')}
+            ${user.role === 'student' && p.class_number ? row('СЂСџРЏВ«', t('class'), p.class_number + '-' + p.class_letter) : ''}
+            ${p.subject ? row('СЂСџвЂњвЂ“', t('subject'), p.subject) : ''}
+            ${p.position ? row('СЂСџвЂ™С', t('position'), p.position) : ''}
+            ${row('СЂСџвЂќвЂ', t('login_label'), user.username)}
+            ${row('СЂСџвЂњВ§', 'Email', user.email || '-')}
           </div>`;
         } else {
           infoContainer.innerHTML = `<div style="text-align:center;padding:20px;color:#6b7280;">
@@ -108,7 +108,7 @@
       try {
         const notifs = await api.notifications.list();
         const container = document.getElementById('notificationsList');
-        if (notifs.length === 0) { showEmpty(container, 'рџ””', t('no_notifications'), t('no_notifications_desc')); return; }
+        if (notifs.length === 0) { showEmpty(container, 'СЂСџвЂќвЂќ', t('no_notifications'), t('no_notifications_desc')); return; }
         container.innerHTML = notifs.map(n => `
           <div class="notification-item ${n.is_read ? '' : 'unread'}" onclick="markNotifRead('${n.id}', this)">
             <div class="notif-title">${n.title}</div>
